@@ -1,0 +1,223 @@
+[env]
+TERM = "xterm-256color"
+WINIT_X11_SCALE_FACTOR = "1"
+
+[window]
+dynamic_padding = true
+decorations = "full"
+title = "Alacritty@CachyOS"
+opacity = 0.75
+blur = true
+decorations_theme_variant = "Dark"
+
+[window.dimensions]
+columns = 120
+lines = 32
+
+[window.class]
+instance = "Alacritty"
+general = "Alacritty"
+
+[scrolling]
+history = 10000
+multiplier = 3
+
+[colors]
+draw_bold_text_with_bright_colors = true
+
+[colors.primary]
+background = "0x1E1B2E"
+foreground = "0xD4BFFF"      # unchanged
+
+[colors.normal]
+black   = "0x2D2B55"         # unchanged
+red     = "0xFF4545"         # was 0xFF5572 (pink ~350°) → real red ~0°
+green   = "0xA8CC8C"         # unchanged
+yellow  = "0xE3C78A"         # unchanged
+blue    = "0x9B8EC4"         # unchanged
+magenta = "0xA87EDF"         # was 0xC792EA → shifted cooler, more blue-purple ~265°
+cyan    = "0x89DDFF"         # unchanged
+white   = "0xD4BFFF"         # unchanged
+
+[colors.bright]
+black   = "0x3D3B6F"         # unchanged
+red     = "0xFF6363"         # was 0xFF6E86 (pink) → actual bright red
+green   = "0xBCE1A2"         # unchanged
+yellow  = "0xFFE49C"         # unchanged
+blue    = "0xB4A0E0"         # unchanged
+magenta = "0xC0A8FF"         # was 0xE0A3FF → shifted to cooler blue-purple
+cyan    = "0xA3EEFF"         # unchanged
+white   = "0xEDE0FF"         # unchanged
+
+
+
+[font]
+size = 12
+
+[font.normal]
+family = "NotoSansM Nerd Font"
+style = "Regular"
+
+[font.bold]
+family = "NotoSansM Nerd Font"
+style = "Bold"
+
+[font.italic]
+family = "NotoSansM Nerd Font"
+style = "Italic"
+
+[font.bold_italic]
+family = "NotoSansM Nerd Font"
+style = "Bold Italic"
+
+[selection]
+semantic_escape_chars = ",│`|:\"' ()[]{}<>\t"
+save_to_clipboard = true
+
+[cursor]
+style = "Underline"
+vi_mode_style = "None"
+unfocused_hollow = true
+thickness = 0.15
+
+[mouse]
+hide_when_typing = true
+
+[[mouse.bindings]]
+mouse = "Middle"
+action = "PasteSelection"
+
+[keyboard]
+[[keyboard.bindings]]
+key = "Paste"
+action = "Paste"
+
+[[keyboard.bindings]]
+key = "Copy"
+action = "Copy"
+
+# Ctrl+L
+[[keyboard.bindings]]
+key = "L"
+mods = "Control"
+action = "ClearLogNotice"
+
+[[keyboard.bindings]]
+key = "Д"  # RU for L
+mods = "Control"
+action = "ClearLogNotice"
+
+[[keyboard.bindings]]
+key = "L"
+mods = "Control"
+mode = "~Vi"
+chars = "\\f"
+
+[[keyboard.bindings]]
+key = "Д"  # RU for L
+mods = "Control"
+mode = "~Vi"
+chars = "\\f"
+
+# Shift+PageUp (universal, no letter change)
+[[keyboard.bindings]]
+key = "PageUp"
+mods = "Shift"
+mode = "~Alt"
+action = "ScrollPageUp"
+
+[[keyboard.bindings]]
+key = "PageDown"
+mods = "Shift"
+mode = "~Alt"
+action = "ScrollPageDown"
+
+[[keyboard.bindings]]
+key = "Home"
+mods = "Shift"
+mode = "~Alt"
+action = "ScrollToTop"
+
+[[keyboard.bindings]]
+key = "End"
+mods = "Shift"
+mode = "~Alt"
+action = "ScrollToBottom"
+
+# Ctrl+Shift+V Paste
+[[keyboard.bindings]]
+key = "V"
+mods = "Control|Shift"
+action = "Paste"
+
+[[keyboard.bindings]]
+key = "М"  # RU for V
+mods = "Control|Shift"
+action = "Paste"
+
+# Ctrl+Shift+C Copy
+[[keyboard.bindings]]
+key = "C"
+mods = "Control|Shift"
+action = "Copy"
+
+[[keyboard.bindings]]
+key = "С"  # RU for C
+mods = "Control|Shift"
+action = "Copy"
+
+# Ctrl+Shift+F Search Forward
+[[keyboard.bindings]]
+key = "F"
+mods = "Control|Shift"
+action = "SearchForward"
+
+[[keyboard.bindings]]
+key = "А"  # RU for F
+mods = "Control|Shift"
+action = "SearchForward"
+
+# Ctrl+Shift+B Search Backward
+[[keyboard.bindings]]
+key = "B"
+mods = "Control|Shift"
+action = "SearchBackward"
+
+[[keyboard.bindings]]
+key = "И"  # RU for B
+mods = "Control|Shift"
+action = "SearchBackward"
+
+# Ctrl+Shift+C in Vi mode
+[[keyboard.bindings]]
+key = "C"
+mods = "Control|Shift"
+mode = "Vi"
+action = "ClearSelection"
+
+[[keyboard.bindings]]
+key = "С"  # RU for C
+mods = "Control|Shift"
+mode = "Vi"
+action = "ClearSelection"
+
+# Ctrl+0
+[[keyboard.bindings]]
+key = "Key0"
+mods = "Control"
+action = "ResetFontSize"
+
+# Ctrl+Q Quit
+[[keyboard.bindings]]
+key = "Q"
+mods = "Control"
+action = "Quit"
+
+[[keyboard.bindings]]
+key = "Й"  # RU for Q
+mods = "Control"
+action = "Quit"
+
+[general]
+live_config_reload = true
+working_directory = "None"
