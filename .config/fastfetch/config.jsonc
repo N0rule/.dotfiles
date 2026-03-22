@@ -4,127 +4,64 @@
   "logo": {
     "type": "file",
     "source": "/home/n0rule/.config/fastfetch/logo.txt",
-    "padding": {
-      "top": 1,
-      "left": 1
-    },
+    "padding": { "top": 1, "left": 1 },
     "color": {
-      "1": "38;2;100;100;120",
-      "2": "38;2;240;235;255"
+      "1": "bright_black",
+      "2": "bright_white"
     }
   },
 
   "display": {
     "separator": "  ",
-    "key": {
-      "width": 14
-    },
+    "key": { "width": 14 },
     "color": {
-      "keys": "35",
-      "title": "35"
+      "keys": "light_magenta",
+      "title": "magenta",
     }
   },
 
   "modules": [
     "title",
+    { "type": "separator", "string": "─"},
+
+    { "type": "os",       "key": "󰣇  OS"       },
+    { "type": "kernel",   "key": "󰌢  Kernel"    },
+    { "type": "uptime",   "key": "󱑀  Uptime"    },
+    { "type": "wm",       "key": "󰕮  WM"        },
+    { "type": "theme",    "key": "󰟡  Theme"      },
+    { "type": "icons",    "key": "󰀻  Icons"      },
+    { "type": "shell",    "key": "󱆃  Shell"      },
+    { "type": "terminal", "key": "󰆍  Terminal"   },
+    { "type": "packages", "key": "󰏗  Packages"   },
+
+    { "type": "separator", "string": "─" },
+
     {
-      "type": "separator",
-      "string": "─"
-    },
-    {
-      "type": "os",
-      "key": "󰣇  OS",
-      "keyColor": "38;2;255;140;190"
-    },
-    {
-      "type": "kernel",
-      "key": "󰌢  Kernel",
-      "keyColor": "38;2;240;140;220"
-    },
-    {
-      "type": "uptime",
-      "key": "󱑀  Uptime",
-      "keyColor": "38;2;220;145;255"
-    },
-    {
-      "type": "wm",
-      "key": "󰕮  WM",
-      "keyColor": "38;2;195;155;255"
-    },
-    {
-      "type": "theme",
-      "key": "󰟡  Theme",
-      "keyColor": "38;2;175;165;255"
-    },
-    {
-      "type": "icons",
-      "key": "󰀻  Icons",
-      "keyColor": "38;2;155;180;255"
-    },
-    {
-      "type": "shell",
-      "key": "󱆃  Shell",
-      "keyColor": "38;2;140;195;255"
-    },
-    {
-      "type": "terminal",
-      "key": "󰆍  Terminal",
-      "keyColor": "38;2;130;210;255"
-    },
-    {
-      "type": "packages",
-      "key": "󰏗  Packages",
-      "keyColor": "38;2;120;225;240"
-    },
-    {
-      "type": "separator",
-      "string": "─"
-    },
-    {
-      "type": "display",
-      "key": "󰍹  Display",
-      "keyColor": "38;2;255;140;190",
+      "type": "display",  "key": "󰍹  Display",
       "compactType": "original-with-scaled-resolution"
     },
+    { "type": "cpu",     "key": "󰻠  CPU"        },
+    { "type": "gpu",     "key": "󰍛  GPU"        },
     {
-      "type": "cpu",
-      "key": "󰻠  CPU",
-      "keyColor": "38;2;235;145;220"
+      "type": "memory",  "key": "󰒋  Memory",
+      "format": "{used} / {total} ({percentage})",
+      "percent": { "green": 30, "yellow": 70 }
     },
     {
-      "type": "gpu",
-      "key": "󰍛  GPU",
-      "keyColor": "38;2;210;150;255"
+      "type": "disk",    "key": "󰋊  Disk",
+      "folders": "/",    "percent": { "green": 30, "yellow": 70 }
     },
     {
-      "type": "memory",
-      "key": "󰑭  Memory",
-      "keyColor": "38;2;185;165;255",
-      "format": "{used} / {total} ({percentage}%)"
+      "type": "battery", "key": "󰁹  Battery",
+      "format": "{4} [{5}]",
+      "percent": { "red": 30, "yellow": 60, "green": 100 }
     },
     {
-      "type": "disk",
-      "key": "󰋊  Disk",
-      "keyColor": "38;2;160;185;255",
-      "folders": "/"
+      "type": "localip", "key": "󰩟  Local IP",
+      "showIpv4": true, "showIpv6": false
     },
-    {
-      "type": "battery",
-      "key": "󰁹  Battery",
-      "keyColor": "38;2;140;205;255",
-      "format": "{4} [{5}]"
-    },
-    {
-      "type": "localip",
-      "key": "󰩟  Local IP",
-      "keyColor": "38;2;125;220;245",
-      "showIpv4": true,
-      "showIpv6": false
-    },
-    {
-      "type": "separator",
-      "string": "─"
-    },
+
+    { "type": "separator", "string": "─" },
     "colors"
   ]
 }

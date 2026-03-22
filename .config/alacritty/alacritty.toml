@@ -1,7 +1,13 @@
+# ── General ───────────────────────────────────────────────────────────────────
+[general]
+live_config_reload = true
+
+# ── Environment ───────────────────────────────────────────────────────────────
 [env]
 TERM = "xterm-256color"
 WINIT_X11_SCALE_FACTOR = "1"
 
+# ── Window ────────────────────────────────────────────────────────────────────
 [window]
 dynamic_padding = true
 decorations = "full"
@@ -18,39 +24,82 @@ lines = 32
 instance = "Alacritty"
 general = "Alacritty"
 
+# ── Scrolling ─────────────────────────────────────────────────────────────────
 [scrolling]
 history = 10000
 multiplier = 3
 
+# ── Colors ────────────────────────────────────────────────────────────────────
 [colors]
 draw_bold_text_with_bright_colors = true
 
 [colors.primary]
-background = "0x1E1B2E"
-foreground = "0xD4BFFF"      # unchanged
+background = "#1e1e2e"
+foreground = "#cdd6f4"
+dim_foreground = "#7f849c"
+bright_foreground = "#cdd6f4"
+
+[colors.cursor]
+text   = "#1e1e2e"
+cursor = "#c6a0f6"   # Mauve ✨ (was Rosewater #f5e0dc)
+
+[colors.vi_mode_cursor]
+text   = "#1e1e2e"
+cursor = "#b4befe"   # Lavender — kept to distinguish vi mode visually
+
+[colors.search.matches]
+foreground = "#1e1e2e"
+background = "#a6adc8"
+
+[colors.search.focused_match]
+foreground = "#1e1e2e"
+background = "#a6e3a1"
+
+[colors.footer_bar]
+foreground = "#1e1e2e"
+background = "#a6adc8"
+
+[colors.hints.start]
+foreground = "#1e1e2e"
+background = "#f9e2af"
+
+[colors.hints.end]
+foreground = "#1e1e2e"
+background = "#aea9d3"  # Mauve tint ✨ (was #a6adc8)
+
+[colors.selection]
+text       = "#cdd6f4"  
+background = "#695888"
 
 [colors.normal]
-black   = "0x2D2B55"         # unchanged
-red     = "0xFF4545"         # was 0xFF5572 (pink ~350°) → real red ~0°
-green   = "0xA8CC8C"         # unchanged
-yellow  = "0xE3C78A"         # unchanged
-blue    = "0x9B8EC4"         # unchanged
-magenta = "0xA87EDF"         # was 0xC792EA → shifted cooler, more blue-purple ~265°
-cyan    = "0x89DDFF"         # unchanged
-white   = "0xD4BFFF"         # unchanged
+black   = "#313244"   # surface0 (darker than original surface1)
+red     = "#ce768e"   # ~15% darker red
+green   = "#8dc088"   # ~15% darker green
+yellow  = "#d3c094"   # ~15% darker yellow
+blue    = "#7499d4"   # ~15% darker blue
+magenta = "#c6a0f6"   # Mauve ✨
+cyan    = "#7dc0b5"   # ~15% darker cyan
+white   = "#d4bfff"   # mauve-white tint
 
 [colors.bright]
-black   = "0x3D3B6F"         # unchanged
-red     = "0xFF6363"         # was 0xFF6E86 (pink) → actual bright red
-green   = "0xBCE1A2"         # unchanged
-yellow  = "0xFFE49C"         # unchanged
-blue    = "0xB4A0E0"         # unchanged
-magenta = "0xC0A8FF"         # was 0xE0A3FF → shifted to cooler blue-purple
-cyan    = "0xA3EEFF"         # unchanged
-white   = "0xEDE0FF"         # unchanged
+black   = "#585b70"   # original surface2
+red     = "#f38ba8"   # original bright red
+green   = "#a6e3a1"   # original bright green
+yellow  = "#f9e2af"   # original bright yellow
+blue    = "#89b4fa"   # original bright blue
+magenta = "#d4b7f8"   # Mauve brightened ✨
+cyan    = "#94e2d5"   # original bright cyan
+white   = "#e7dbff"   # mauve-white, more white ✨
 
+[[colors.indexed_colors]]
+index = 16
+color = "#fab387"
 
+[[colors.indexed_colors]]
+index = 17
+color = "#c6a0f6"   # Mauve ✨ (was Rosewater #f5e0dc)
 
+# ── Font ──────────────────────────────────────────────────────────────────────
 [font]
 size = 12
 
@@ -70,16 +119,19 @@ style = "Italic"
 family = "NotoSansM Nerd Font"
 style = "Bold Italic"
 
+# ── Selection ─────────────────────────────────────────────────────────────────
 [selection]
 semantic_escape_chars = ",│`|:\"' ()[]{}<>\t"
 save_to_clipboard = true
 
+# ── Cursor ────────────────────────────────────────────────────────────────────
 [cursor]
 style = "Underline"
 vi_mode_style = "None"
 unfocused_hollow = true
 thickness = 0.15
 
+# ── Mouse ─────────────────────────────────────────────────────────────────────
 [mouse]
 hide_when_typing = true
 
@@ -87,6 +139,7 @@ hide_when_typing = true
 mouse = "Middle"
 action = "PasteSelection"
 
+# ── Keyboard ──────────────────────────────────────────────────────────────────
 [keyboard]
 [[keyboard.bindings]]
 key = "Paste"
@@ -217,7 +270,3 @@ action = "Quit"
 key = "Й"  # RU for Q
 mods = "Control"
 action = "Quit"
-
-[general]
-live_config_reload = true
-working_directory = "None"
