@@ -8,12 +8,25 @@ set -gx EDITOR nvim
 atuin init fish | source
 zoxide init fish | source
 fzf --fish | source
+# starship init fish | source
+
+if not functions -q fisher
+    curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source
+    fisher install jorgebucaran/fisher
+    fisher install jorgebucaran/hydro
+end
 
 # ── Greeting ──────────────────────────────────────────────────────────────────
 # Uncomment to silence the default CachyOS fastfetch greeting
 # function fish_greeting
 # end
 
+# ── Theme ───────────────────────────────────────────────────────────────────
+fish_config theme choose catppuccin-mocha
+
+set hydro_multiline true
+set hydro_color_pwd blue
+set hydro_color_prompt magenta
 # ── Aliases ───────────────────────────────────────────────────────────────────
 alias cat 'bat'
 alias c   'clear'
