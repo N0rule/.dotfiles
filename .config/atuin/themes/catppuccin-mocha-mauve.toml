@@ -1,0 +1,12 @@
+[theme]
+name = "catppuccin-mocha-mauve"
+
+[colors]
+AlertInfo = "#8dc088"
+AlertWarn = "#d3c094"
+AlertError = "#ce768e"
+Annotation = "#cba6f7"
+Base = "#d4bfff"
+Guidance = "#9399b2"
+Important = "#ce768e"
+Title = "#cba6f7"

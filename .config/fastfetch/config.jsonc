@@ -6,8 +6,8 @@
     "source": "/home/n0rule/.config/fastfetch/logo.txt",
     "padding": { "top": 1, "left": 1 },
     "color": {
-      "1": "bright_black",
-      "2": "bright_white"
+      "1": "light_black",
+      "2": "light_white"
     }
   },
 
@@ -16,7 +16,7 @@
     "key": { "width": 14 },
     "color": {
       "keys": "light_magenta",
-      "title": "magenta",
+      "title": "magenta"
     }
   },
 
