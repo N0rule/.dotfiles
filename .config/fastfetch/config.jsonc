@@ -22,7 +22,7 @@
 
   "modules": [
     "title",
-    { "type": "separator", "string": "─"},
+    { "type": "separator", "string": "─" },
 
     { "type": "os",       "key": "󰣇  OS"       },
     { "type": "kernel",   "key": "󰌢  Kernel"    },
@@ -60,8 +60,9 @@
       "type": "localip", "key": "󰩟  Local IP",
       "showIpv4": true, "showIpv6": false
     },
-
+    { "type": "uptime",      "key": "󱑀  Uptime"      },
+    
     { "type": "separator", "string": "─" },
-    "colors"
+    { "type": "colors", "paddingLeft": 4, "symbol": "circle" }
   ]
 }
