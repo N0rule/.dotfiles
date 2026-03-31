@@ -104,19 +104,19 @@ color = "#c6a0f6"   # Mauve ✨ (was Rosewater #f5e0dc)
 size = 12
 
 [font.normal]
-family = "NotoSansM Nerd Font"
+family = "FiraCode Nerd Font Mono"
 style = "Regular"
 
 [font.bold]
-family = "NotoSansM Nerd Font"
+family = "FiraCode Nerd Font Mono"
 style = "Bold"
 
 [font.italic]
-family = "NotoSansM Nerd Font"
+family = "FiraCode Nerd Font Mono"
 style = "Italic"
 
 [font.bold_italic]
-family = "NotoSansM Nerd Font"
+family = "FiraCode Nerd Font Mono"
 style = "Bold Italic"
 
 # ── Selection ─────────────────────────────────────────────────────────────────
