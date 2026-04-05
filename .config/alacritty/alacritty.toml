@@ -270,3 +270,8 @@ action = "Quit"
 key = "Й"  # RU for Q
 mods = "Control"
 action = "Quit"
+
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\u001B\r"
