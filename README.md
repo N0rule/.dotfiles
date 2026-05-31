@@ -1,6 +1,6 @@
 # Dotfiles
 
-![Setup Image](https://github-production-user-asset-6210df.s3.amazonaws.com/30196774/568472891-fdbdfdf7-5fcd-4e2e-b22c-8af6430ef928.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20260324%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260324T151324Z&X-Amz-Expires=300&X-Amz-Signature=70d442af28eff3a756d34f187903a2332e49ee790d91fd36bc9ace380be8e5f9&X-Amz-SignedHeaders=host)
+![Setup Image](https://github.com/user-attachments/assets/d4b02dc2-1519-451c-8be5-b5706c4aadb4)
 
 My personal configuration files for Linux development environment, managed with [GNU Stow](https://www.gnu.org/software/stow/).
 
