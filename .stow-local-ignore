@@ -2,3 +2,7 @@
 .*\.sh
 .*\.png
 .*atuin-receipt\.json
+.*\.git
+.*\.gitignore
+.*\.gitattributes
+.*\.gitmodules
