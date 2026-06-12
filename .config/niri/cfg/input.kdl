@@ -5,9 +5,9 @@ input {
     keyboard {
         xkb {
             layout "us,ru,ua"
-            options "grp:alt_shift_toggle"
+            options "grp:caps_toggle"
         }
-        numlock // Enable numlock on startup
+        // numlock // Enable numlock on startup
     }
 
     touchpad {
@@ -18,10 +18,10 @@ input {
     mouse {
         // If you want to disable Mouse Acceleration,
         // uncomment the lines below.
-        //accel-profile "flat"
-        //accel-speed 0.0
+        accel-profile "flat"
+        accel-speed 0.0
     }
 
-    focus-follows-mouse // Automatically focus windows under the mouse pointer
+    focus-follows-mouse max-scroll-amount="50%" // Automatically focus windows under the mouse pointer
     workspace-auto-back-and-forth // Enable workspace back & forth switching
 }

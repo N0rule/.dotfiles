@@ -2,13 +2,12 @@
 source /usr/share/cachyos-fish-config/cachyos-config.fish
 
 # ── Environment ───────────────────────────────────────────────────────────────
-set -gx EDITOR nvim
+set -gx EDITOR zeditor
 
 # ── Integrations ──────────────────────────────────────────────────────────────
 atuin init fish | source
 zoxide init fish | source
 fzf --fish | source
-# starship init fish | source
 
 if not functions -q fisher
     curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source

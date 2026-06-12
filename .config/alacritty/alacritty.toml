@@ -1,14 +1,11 @@
-# ── General ───────────────────────────────────────────────────────────────────
 [general]
-import = ["~/.config/alacritty/themes/noctalia.toml"]
 live_config_reload = true
+working_directory = "None"
 
-# ── Environment ───────────────────────────────────────────────────────────────
 [env]
 TERM = "xterm-256color"
 WINIT_X11_SCALE_FACTOR = "1"
 
-# ── Window ────────────────────────────────────────────────────────────────────
 [window]
 dynamic_padding = true
 decorations = "full"
@@ -25,12 +22,10 @@ lines = 32
 instance = "Alacritty"
 general = "Alacritty"
 
-# ── Scrolling ─────────────────────────────────────────────────────────────────
 [scrolling]
 history = 10000
 multiplier = 3
 
-# ── Colors ────────────────────────────────────────────────────────────────────
 [colors]
 # draw_bold_text_with_bright_colors = true
 
@@ -69,7 +64,7 @@ foreground = "#1e1e2e"
 background = "#aea9d3"  # Mauve tint ✨ (was #a6adc8)
 
 [colors.selection]
-text       = "#cdd6f4"  
+text       = "#cdd6f4"
 background = "#695888"
 
 [colors.normal]
@@ -92,15 +87,6 @@ magenta = "#d4b7f8"   # Mauve brightened ✨
 cyan    = "#94e2d5"   # original bright cyan
 white   = "#e7dbff"   # mauve-white, more white ✨
 
-[[colors.indexed_colors]]
-index = 16
-color = "#fab387"
-
-[[colors.indexed_colors]]
-index = 17
-color = "#c6a0f6"   # Mauve ✨ (was Rosewater #f5e0dc)
-
-# ── Font ──────────────────────────────────────────────────────────────────────
 [font]
 size = 12
 
@@ -120,19 +106,16 @@ style = "Italic"
 family = "FiraCode Nerd Font Mono"
 style = "Bold Italic"
 
-# ── Selection ─────────────────────────────────────────────────────────────────
 [selection]
 semantic_escape_chars = ",│`|:\"' ()[]{}<>\t"
 save_to_clipboard = true
 
-# ── Cursor ────────────────────────────────────────────────────────────────────
 [cursor]
 style = "Underline"
 vi_mode_style = "None"
 unfocused_hollow = true
 thickness = 0.15
 
-# ── Mouse ─────────────────────────────────────────────────────────────────────
 [mouse]
 hide_when_typing = true
 
@@ -140,7 +123,6 @@ hide_when_typing = true
 mouse = "Middle"
 action = "PasteSelection"
 
-# ── Keyboard ──────────────────────────────────────────────────────────────────
 [keyboard]
 [[keyboard.bindings]]
 key = "Paste"
@@ -150,14 +132,8 @@ action = "Paste"
 key = "Copy"
 action = "Copy"
 
-# Ctrl+L
 [[keyboard.bindings]]
 key = "L"
-mods = "Control"
-action = "ClearLogNotice"
-
-[[keyboard.bindings]]
-key = "Д"  # RU for L
 mods = "Control"
 action = "ClearLogNotice"
 
@@ -165,15 +141,8 @@ action = "ClearLogNotice"
 key = "L"
 mods = "Control"
 mode = "~Vi"
-chars = "\\f"
+chars = "\f"
 
-[[keyboard.bindings]]
-key = "Д"  # RU for L
-mods = "Control"
-mode = "~Vi"
-chars = "\\f"
-
-# Shift+PageUp (universal, no letter change)
 [[keyboard.bindings]]
 key = "PageUp"
 mods = "Shift"
@@ -198,51 +167,26 @@ mods = "Shift"
 mode = "~Alt"
 action = "ScrollToBottom"
 
-# Ctrl+Shift+V Paste
 [[keyboard.bindings]]
 key = "V"
 mods = "Control|Shift"
 action = "Paste"
 
 [[keyboard.bindings]]
-key = "М"  # RU for V
-mods = "Control|Shift"
-action = "Paste"
-
-# Ctrl+Shift+C Copy
-[[keyboard.bindings]]
 key = "C"
 mods = "Control|Shift"
 action = "Copy"
 
-[[keyboard.bindings]]
-key = "С"  # RU for C
-mods = "Control|Shift"
-action = "Copy"
-
-# Ctrl+Shift+F Search Forward
 [[keyboard.bindings]]
 key = "F"
 mods = "Control|Shift"
 action = "SearchForward"
 
 [[keyboard.bindings]]
-key = "А"  # RU for F
-mods = "Control|Shift"
-action = "SearchForward"
-
-# Ctrl+Shift+B Search Backward
-[[keyboard.bindings]]
 key = "B"
 mods = "Control|Shift"
 action = "SearchBackward"
 
-[[keyboard.bindings]]
-key = "И"  # RU for B
-mods = "Control|Shift"
-action = "SearchBackward"
-
-# Ctrl+Shift+C in Vi mode
 [[keyboard.bindings]]
 key = "C"
 mods = "Control|Shift"
@@ -250,29 +194,6 @@ mode = "Vi"
 action = "ClearSelection"
 
 [[keyboard.bindings]]
-key = "С"  # RU for C
-mods = "Control|Shift"
-mode = "Vi"
-action = "ClearSelection"
-
-# Ctrl+0
-[[keyboard.bindings]]
 key = "Key0"
 mods = "Control"
 action = "ResetFontSize"
-
-# Ctrl+Q Quit
-[[keyboard.bindings]]
-key = "Q"
-mods = "Control"
-action = "Quit"
-
-[[keyboard.bindings]]
-key = "Й"  # RU for Q
-mods = "Control"
-action = "Quit"
-
-[[keyboard.bindings]]
-key = "Return"
-mods = "Shift"
-chars = "\u001B\r"

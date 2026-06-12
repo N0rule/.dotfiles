@@ -9,6 +9,7 @@
             proportion 0.5
             proportion 0.66667
         }
+
     // You can change how the focus ring looks.
     focus-ring {
         // Uncomment this line to disable the focus ring.
