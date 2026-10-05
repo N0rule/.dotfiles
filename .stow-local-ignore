@@ -6,3 +6,10 @@
 .*\.gitignore
 .*\.gitattributes
 .*\.gitmodules
+^/setup\.fish$
+^/packages
+^/assets
+^/tests
+^/system
+^/scripts
+^/\.config/noctalia/.*\.json$

@@ -1,3 +1,4 @@
 .config/tmux/plugins
 .config/noctalia/colors.json
 .config/noctalia/*/
+__pycache__/

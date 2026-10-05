@@ -1,0 +1,8 @@
+# Native C++ Noctalia, providing /usr/bin/noctalia
+noctalia-git
+# Browser launched by Mod+B
+brave-origin-bin
+# Cursor selected in Niri
+bibata-cursor-theme-bin
+# Qt configuration utility used on the source system (provides qt6ct)
+qt6ct-kde

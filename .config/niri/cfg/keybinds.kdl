@@ -4,7 +4,7 @@ binds {
     // https://github.com/YaLTeR/niri/wiki/Configuration:-Key-Bindings
 
     // ─── noctalia-shell keybinds ───
-    // https://docs.noctalia.dev/getting-started/keybinds/
+    // https://github.com/noctalia-dev/noctalia
 
     Mod+Shift+ESCAPE                     { show-hotkey-overlay; }
 
@@ -15,17 +15,17 @@ binds {
     Mod+Z                               hotkey-overlay-title="Open Editor: Zed" { spawn "zeditor"; }
     Mod+E                               hotkey-overlay-title="File Manager: Nautilus" { spawn "nautilus"; }
     Mod+ALT+L                           hotkey-overlay-title="Lock Screen: noctalia lock" { spawn-sh "noctalia msg session lock"; }
-    Mod+Shift+Q                         hotkey-overlay-title="Session Menu: noctalia session suspend" { spawn-sh "noctalia msg session suspend"; }
+    Mod+Shift+Q                         hotkey-overlay-title="Suspend: noctalia session suspend" { spawn-sh "noctalia msg session suspend"; }
 
     // ─── Media Controls ───
     XF86AudioRaiseVolume                allow-when-locked=true { spawn-sh "noctalia msg volume-up"; }
     XF86AudioLowerVolume                allow-when-locked=true { spawn-sh "noctalia msg volume-down"; }
     XF86AudioMute                       allow-when-locked=true { spawn-sh "noctalia msg volume-mute"; }
     XF86AudioMicMute                    allow-when-locked=true { spawn-sh "noctalia msg mic-mute"; }
-    XF86AudioNext                       allow-when-locked=true { spawn-sh "noctalia msg media-next"; }
-    XF86AudioPrev                       allow-when-locked=true { spawn-sh "noctalia msg media-previous"; }
-    XF86AudioPlay                       allow-when-locked=true { spawn-sh "noctalia msg media-play-pause"; }
-    XF86AudioPause                      allow-when-locked=true { spawn-sh "noctalia msg media-play-pause"; }
+    XF86AudioNext                       allow-when-locked=true { spawn-sh "noctalia msg media next"; }
+    XF86AudioPrev                       allow-when-locked=true { spawn-sh "noctalia msg media previous"; }
+    XF86AudioPlay                       allow-when-locked=true { spawn-sh "noctalia msg media toggle"; }
+    XF86AudioPause                      allow-when-locked=true { spawn-sh "noctalia msg media toggle"; }
 
     // ─── Brightness Controls ───
     XF86MonBrightnessUp                 allow-when-locked=true { spawn-sh "noctalia msg brightness-up"; }

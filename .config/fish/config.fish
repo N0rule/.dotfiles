@@ -1,5 +1,9 @@
 # ── Base ──────────────────────────────────────────────────────────────────────
-source /usr/share/cachyos-fish-config/cachyos-config.fish
+if test -f /usr/share/cachyos-fish-config/cachyos-config.fish
+    source /usr/share/cachyos-fish-config/cachyos-config.fish
+end
+
+status is-interactive; or return
 
 # ── Environment ───────────────────────────────────────────────────────────────
 set -gx EDITOR zeditor
@@ -8,12 +12,6 @@ set -gx EDITOR zeditor
 atuin init fish | source
 zoxide init fish | source
 fzf --fish | source
-
-if not functions -q fisher
-    curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source
-    fisher install jorgebucaran/fisher
-    fisher install jorgebucaran/hydro
-end
 
 # ── Greeting ──────────────────────────────────────────────────────────────────
 # Uncomment to silence the default CachyOS fastfetch greeting

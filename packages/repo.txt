@@ -1,0 +1,42 @@
+# Desktop and session
+niri
+xwayland-satellite
+xdg-desktop-portal-gnome
+xdg-desktop-portal-gtk
+xdg-user-dirs
+networkmanager
+bluez
+bluez-utils
+pipewire
+pipewire-alsa
+pipewire-pulse
+wireplumber
+gnome-keyring
+polkit-kde-agent
+brightnessctl
+ddcutil
+# Bongocat keyboard input through keyd's virtual keyboard
+keyd
+evtest
+# Terminal and shell
+git
+paru
+cachyos-fish-config
+fish
+alacritty
+tmux
+atuin
+btop
+fastfetch
+yazi
+bat
+fzf
+zoxide
+wl-clipboard
+# Apps launched by Niri bindings
+nautilus
+zed
+# Fonts and Qt app settings
+ttf-firacode-nerd
+noto-fonts
+noto-fonts-emoji

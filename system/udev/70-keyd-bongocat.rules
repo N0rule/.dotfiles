@@ -1,0 +1,3 @@
+# Stable path and active-seat read access to only the keyd virtual keyboard.
+# Must run before 73-seat-late.rules processes the uaccess tag.
+SUBSYSTEM=="input", KERNEL=="event*", ATTRS{name}=="keyd virtual keyboard", SYMLINK+="input/by-id/keyd-virtual-keyboard", TAG+="uaccess"

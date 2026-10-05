@@ -1,200 +1,262 @@
-# Dotfiles
+# CachyOS · Niri · native Noctalia
 
-![Setup Image](https://github.com/user-attachments/assets/d4b02dc2-1519-451c-8be5-b5706c4aadb4)
+Personal dotfiles for CachyOS, Niri and native C++ Noctalia v5, refreshed from
+this machine on 2026-10-05. The installer is a **Fish script** using standard
+Linux tools. Python, GNU Stow and an extra UI package are not required.
 
-My personal configuration files for Linux development environment, managed with [GNU Stow](https://www.gnu.org/software/stow/).
+## Interactive setup
 
-## 📋 Table of Contents
+On an installed CachyOS system with a working network, run as your normal user:
 
-- [Installation](#installation)
-- [What's Included](#whats-included)
-- [Tmux Keybinds](#tmux-keybinds)
-- [Dependencies](#dependencies)
-
----
-
-## Installation
-
-### Prerequisites
-
-- Linux system (tested on Arch/Fedora/Ubuntu)
-- `git` and `stow` installed
-
-### Setup Instructions
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/N0rule/.dotfiles.git ~/.dotfiles
-   cd ~/.dotfiles
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   # Arch Linux
-   sudo pacman -S fish tmux alacritty
-
-   # Ubuntu/Debian
-   sudo apt install fish tmux alacritty
-
-   # Fedora
-   sudo dnf install fish tmux alacritty
-   ```
-
-3. **Deploy dotfiles with Stow:**
-   ```bash
-   stow .
-   ```
-   This will create symlinks in your home directory for all configurations.
-
-4. **Set fish as default shell:**
-   ```bash
-   chsh -s /usr/bin/fish
-   ```
-
-5. **Install Tmux Plugin Manager (if not already present):**
-   ```bash
-   git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
-   tmux source ~/.config/tmux/tmux.conf
-   ```
-   Then inside tmux, press `<prefix> + I` to install plugins.
-
----
-
-## What's Included
-
-| Tool | Purpose | Config Location |
-|------|---------|-----------------|
-| **Fish** | Shell with auto-suggestions | `.config/fish/` |
-| **Tmux** | Terminal multiplexer | `.config/tmux/` |
-| **Alacritty** | GPU-accelerated terminal emulator | `.config/alacritty/` |
-| **Atuin** | Shell history search | `.config/atuin/` |
-| **Btop** | System monitor | `.config/btop/` |
-| **Fastfetch** | System info display | `.config/fastfetch/` |
-| **Yazi** | TUI file manager | `.config/yazi/` |
-
----
-
-## Tmux Keybinds
-
-All keybinds use `Alt` (Meta) as the modifier. No custom prefix needed.
-
-### Session & Window Management
-
-| Keybind | Action |
-|---------|--------|
-| `Alt + R` | Reload tmux config |
-| `Alt + S` | Choose/switch sessions |
-| `Alt + 1-9` | Switch to window 1-9 |
-| `Alt + Enter` | Create new window |
-| `Alt + Q` | Kill current window |
-| `Alt + D` | Detach from session |
-| `Alt + Shift + Q` | Kill entire session (with confirmation) |
-
-### Pane Navigation
-
-| Keybind | Action |
-|---------|--------|
-| `Alt + Left/Right/Up/Down` | Navigate between panes |
-| `Alt + Shift + Left/Right/Up/Down` | Resize pane |
-| `Alt + H` | Split pane horizontally |
-| `Alt + V` | Split pane vertically |
-| `Alt + C` | Kill current pane |
-
-### Search & Copy
-
-| Keybind | Action |
-|---------|--------|
-| `Alt + /` | Search down (in copy mode) |
-| `Alt + ?` | Search up (in copy mode) |
-| `V` (in copy mode) | Begin selection |
-| `Y` (in copy mode) | Copy to clipboard |
-
----
-
-## Dependencies
-
-### Required
-
-- **git** - Version control
-- **stow** - Dotfiles deployment tool
-- **fish** - Modern shell
-- **tmux** - Terminal multiplexer
-
-### Optional
-
-- **alacritty** - Terminal emulator (GPU-accelerated)
-- **atuin** - Enhanced shell history
-- **btop** - System performance monitor
-- **fastfetch** - System information tool
-- **yazi** - File manager with preview
-- **wl-copy** or **xclip** - Clipboard support (for tmux copy)
-
-### Installation Commands
-
-**Arch Linux:**
-```bash
-sudo pacman -S git stow fish tmux alacritty atuin btop fastfetch yazi wl-clipboard
+```fish
+sudo pacman -Syu --needed git fish
+git clone https://github.com/N0rule/.dotfiles.git ~/.dotfiles
+cd ~/.dotfiles
+fish --no-config setup.fish
 ```
 
-**Ubuntu/Debian:**
-```bash
-sudo apt install git stow fish tmux alacritty xclip
-# For other tools, use snap or build from source
+The terminal UI lets you choose:
+
+1. Packages and configs, packages only, or configs only.
+2. Individual packages to install (including the native `noctalia-git` AUR package).
+3. Individual application configs to deploy.
+4. Wallpaper and profile image independently; **both are off by default**.
+5. Optional keyd/Bongocat system setup and HP EliteBook button mappings.
+   These are separate choices, both off by default; selecting HP mappings
+   also enables the keyd setup.
+6. Final action: **1. Apply (default)**, **2. Test apply**, **3. Cancel**.
+   Enter selects Apply. Test apply prints the plan without changing packages,
+   configs or services.
+
+In each checklist, enter numbers to toggle items, `a` for all, `n` for none,
+Enter to finish, or `q` to cancel. For example, `2 5` toggles rows 2 and 5.
+Nothing is installed or copied before the final action screen. Choose `1` or
+press Enter to apply; choose `2` to preview without making changes.
+Package and config selections are independent: a config can reference an app
+or plugin you chose not to install. Keep existing app settings by deselecting
+its config.
+
+Package installation uses `sudo pacman -Syu --needed`, followed by
+`paru -S --needed` for selected AUR packages. Review the normal package prompts
+and AUR build files. If AUR packages are selected, include `paru` or have it
+installed already. Available packages are in [packages/repo.txt](packages/repo.txt)
+and [packages/aur.txt](packages/aur.txt). This includes desktop and terminal
+utilities; development, gaming and music apps are outside the installer.
+
+Native Noctalia runs as `noctalia` and uses `noctalia msg` bindings. Its project
+is [noctalia-dev/noctalia](https://github.com/noctalia-dev/noctalia); this setup
+uses `noctalia-git`, rather than the legacy Quickshell shell. The source system
+used Niri `26.04-1.1` and Noctalia `5.1.0.r5545.ge4eb0ff97-1`.
+Installation gets current packages. Validate compatibility after updates:
+
+```fish
+fish --no-config setup.fish --check
 ```
 
-**Fedora:**
-```bash
-sudo dnf install git stow fish tmux alacritty wl-clipboard
+The Niri config uses CachyOS blur settings, which can differ from other builds.
+
+## Wallpaper and profile image
+
+They are optional and not required for Niri or Noctalia. If selected, the script
+copies the corresponding image into `~/Pictures/Dotfiles/` and includes its
+paths in the deployed Noctalia config. If skipped, it omits that image's paths
+and settings, keeping Noctalia's defaults or existing GUI overrides. Wallpaper
+and profile image can be selected separately. No images are deleted when you
+later skip them. The repo's source TOML retains the complete snapshot; filtering
+happens only during deployment.
+
+## Command-line use
+
+`--no-config` skips Fish startup files, so user aliases and integrations cannot
+interfere with setup. You can also run `./setup.fish`; its executable shebang
+already includes `--no-config`.
+
+```fish
+# Preview all configs; no images or package changes.
+fish --no-config setup.fish --dry-run
+
+# Preview just the desktop packages and configs, with the wallpaper.
+fish --no-config setup.fish --install --apply --dry-run \
+    --packages niri,noctalia-git,paru \
+    --configs niri,noctalia --wallpaper
+
+# Deploy terminal configs only.
+fish --no-config setup.fish --apply --configs fish,alacritty,tmux
+
+# List available choices or read the help.
+fish --no-config setup.fish --list
+fish --no-config setup.fish --help
 ```
 
----
+Explicit command-line `--install` and `--apply` execute directly; add
+`--dry-run` to preview. Package/config lists default to all when omitted.
+Use `--packages none` or `--configs none` for an empty list.
+`--wallpaper` and `--avatar` are independent image options.
+`--home /path/to/existing/test-home` changes the deployment destination;
+package installation still affects the system. The script never changes the
+login shell. Selecting keyd system setup explicitly enables/restarts its service.
 
-## Configuration Notes
+## Config deployment and backups
 
-### Theme
+| Config | Purpose |
+| --- | --- |
+| `niri` | Input, layout, rules, shortcuts, startup and theme |
+| `noctalia` | Native bar, idle, theme and plugin preferences |
+| `fish` | CachyOS shell, Atuin, zoxide, fzf and aliases |
+| `alacritty` | Transparent terminal with FiraCode Nerd Font |
+| `tmux` | Alt bindings, Catppuccin and session persistence |
+| `atuin`, `btop`, `fastfetch`, `yazi` | Terminal tools and themes |
 
-Tmux uses **Catppuccin (Mocha)** theme for a cohesive color scheme.
+Only selected configs are copied. Existing identical files are skipped, and
+unrelated files are preserved. Conflicts are backed up under
+`~/.local/state/dotfiles-backups/<timestamp>/`. Directory symlinks are backed
+up and detached before changed files are written, preserving their contents
+and keeping the linked repository untouched. Backup symlinks have a `.symlink`
+suffix and use absolute targets so they still work after moving. Stop the
+affected app before restoring files from the printed backup path.
 
-### Plugins
+Existing identical Stow links remain in place; changed links may become local
+copies. Edit repo files and rerun the script to deploy updates. Deployment
+honors `XDG_CONFIG_HOME` when it is inside your home directory. Unset
+`NOCTALIA_CONFIG_HOME` before deploying this snapshot. Do not run `stow .`:
+this repo also includes the installer, docs, manifests and optional assets.
 
-Tmux plugins included:
-- `tpm` - Plugin manager
-- `catppuccin/tmux` - Theme
-- `tmux-resurrect` - Session persistence
-- `tmux-sensible` - Better defaults
-- `tmux-cpu` - CPU monitor
-- `tmux-battery` - Battery status
+Yazi's `flavors/noctalia.yazi/tmtheme.xml` is part of the selected Yazi config
+and is copied along with `flavor.toml`. Yazi uses it for syntax highlighting
+in file previews; no Stow command or extra installation step is needed.
 
-These are automatically installed via `tpm`.
+## Keyd, Bongocat and HP EliteBook buttons
 
----
+`keyd` and `evtest` are in the package checklist. Choose **keyd-bongocat** in
+the system keyboard checklist to configure the virtual keyboard. The generic
+profile passes keys through and contains no HP button mappings.
 
-## Usage Tips
+Choose **elitebook-buttons** only for this HP EliteBook. It implies keyd setup
+and uses the existing three remaps: monitor button opens the terminal, answer
+button takes a region screenshot, and hangup button closes the window.
+The captured profile uses a wildcard device match, as on the source system;
+other models can emit different chords, so check `keyd monitor` before using it.
 
-1. **First-time Tmux setup:**
-   ```bash
-   tmux new-session -d -s main
-   ```
+```fish
+# Preview generic keyd/Bongocat setup without HP remaps.
+fish --no-config setup.fish --apply --configs noctalia --keyd --dry-run
 
-2. **Reload config on changes:**
-   Press `Alt + R` in any tmux window
+# Apply generic keyd setup (requires installed keyd and evtest).
+fish --no-config setup.fish --apply --configs noctalia --keyd
 
-3. **Access history search (Atuin):**
-   Press `Ctrl + R` in fish shell
+# Explicitly use the HP EliteBook profile instead.
+fish --no-config setup.fish --apply --configs noctalia --elitebook
+```
 
----
+Applying keyd setup installs the selected profile as `/etc/keyd/default.conf`
+and a `70-keyd-bongocat.rules` udev rule, then validates the installed configs,
+reloads rules and enables/restarts keyd. Existing files are backed up under
+`/var/backups/dotfiles/<timestamp>/`; other keyd config files are preserved.
+The stable device path is `/dev/input/by-id/keyd-virtual-keyboard`. The rule
+grants the active local session read access only to that virtual device; it
+does not add the user to the broad `input` group. A new login may be needed
+for the session permissions to take effect.
 
-## Customization
+Select the Noctalia config as well to configure the `cat_2` widget's input path.
+Existing GUI overrides still take precedence. Without keyd setup selected,
+the installer omits this input path; keyboard animation then needs a device
+configured manually. Bongocat can also read other input devices directly;
+keyd is the chosen backend for these dots, rather than a plugin requirement.
+The plugin requires `evtest` and permission to read its selected devices.
+See the [plugin documentation](https://github.com/noctalia-dev/official-plugins/blob/main/bongocat/README.md).
 
-Edit the config files directly:
-- Shell: `~/.config/fish/config.fish`
-- Tmux: `~/.config/tmux/tmux.conf`
-- Terminal: `~/.config/alacritty/alacritty.toml`
+For a test deployment, combine `--home <test-home>` with
+`--system-root <test-system-root>`. Both directories must exist. This stages
+system files under the test root and does not run sudo, restart services or
+touch live devices. The script refuses `--keyd --home <test-home>` without a
+test system root to prevent changes to the host during a test.
 
-After making changes, reload with `Alt + R` (for tmux) or `source ~/.config/fish/config.fish` (for fish).
+## Noctalia and shell preferences
 
----
+Noctalia GUI overrides in `~/.local/state/noctalia/settings.toml` take precedence
+over the deployed TOML. The installer preserves them. If you want to reset GUI
+choices to the repo defaults, quit Noctalia and back up/move that state file
+out of the state directory before restarting. For a custom `XDG_STATE_HOME`,
+use its `noctalia/settings.toml` instead.
 
-## License
+Legacy Noctalia `settings.json` and `plugins.json` are retained for reference
+and excluded from deployment. The native snapshot enables screen-recorder and
+bongocat plugins; install them through Noctalia's plugins UI if widgets are
+missing. Plugin caches, clipboard history, notification logs and credentials
+are not deployed.
 
-Personal use configuration. Feel free to fork and adapt to your needs.
+The original Fish theme selection (`catppuccin-mocha`) and Hydro preferences
+are retained. If you use Hydro, install it explicitly through Fisher; Fish
+startup no longer downloads plugins. The theme must already be available to
+Fish. No new color palette or terminal is introduced by this installer.
+
+The snapshot keeps `us,ru,ua` keyboard layouts (Caps Lock cycles), idle timers
+of 2 minutes to turn screens off, 4 to lock and 15 to lock/suspend, and the
+existing Catppuccin desktop theme. Monitor overrides are disabled by default;
+run `niri msg outputs` and edit `.config/niri/cfg/display.kdl` for your hardware.
+The keyd option configures Bongocat's stable virtual keyboard. Lockscreen
+positions can be adjusted through the UI.
+
+After Noctalia GUI changes, export settings you want to retain:
+
+```fish
+noctalia config export merged > /tmp/noctalia-config.toml
+noctalia config validate /tmp/noctalia-config.toml
+```
+
+Review personal paths and obsolete widgets, then copy the export into
+`.config/noctalia/config.toml`. Theme templates can update app colors outside
+this repo; copy generated settings you want to keep into the repo before
+redeploying.
+
+## Finish a fresh session setup
+
+CachyOS usually configures these services already. Check them and enable the
+ones you need:
+
+```fish
+sudo systemctl enable --now NetworkManager.service bluetooth.service
+systemctl --user enable --now pipewire.socket pipewire-pulse.socket wireplumber.service
+systemctl --user enable --now gnome-keyring-daemon.socket
+systemctl --user enable --now polkit-kde.service
+xdg-user-dirs-update
+mkdir -p ~/Pictures/Screenshots
+chsh -s /usr/bin/fish
+```
+
+Select **Niri** in your existing login manager, or use `niri-session` from a
+TTY. Niri starts Noctalia automatically. Use one Polkit agent: the commands
+above reproduce this machine's KDE agent service; disable it if you enable
+Noctalia's agent instead.
+
+For tmux plugins, install TPM once:
+
+```fish
+git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
+tmux
+```
+
+Press Ctrl+B, then Shift+I to install Catppuccin, resurrect, continuum, sensible,
+CPU and battery plugins. Fish's Ctrl+R opens Atuin; `y` opens Yazi and changes
+directory on exit. Niri's Mod is Super/Windows: Mod+Space opens the launcher,
+Ctrl+Alt+T opens Alacritty, Mod+B/Z/E opens Brave Origin/Zed/Nautilus,
+Mod+Alt+L locks and Mod+Shift+Q suspends. Mod+Shift+Escape shows all shortcuts.
+
+## Installer checks
+
+```fish
+fish --no-config tests/test_setup.fish
+```
+
+These checks deploy into temporary homes, exercising optional images, repeated
+deployment, backups and shared directory links. They also load the deployed
+image settings through Noctalia with fresh state, decode both PNGs using its
+theme tool, and validate the deployed Niri config. They do not install packages
+or test a complete fresh CachyOS login; graphics hardware and future package
+versions still need validation on the new machine. Select both `noctalia` in
+the configs checklist and the wallpaper option to apply the wallpaper settings.
+Selecting only the image copies it without changing the shell's configuration.
+
+Push committed changes to GitHub before following the clone instructions on
+a new machine, or copy the updated repository there directly. A clone from
+GitHub includes only changes that have been pushed.
