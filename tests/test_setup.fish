@@ -12,6 +12,17 @@ function expect
 end
 function invoke
     # Check both status and runtime diagnostics.
+    # Noctalia now includes system setup by default. All test deployments use
+    # a dedicated system root so they never invoke sudo or touch host services.
+    if not contains -- --system-root $argv
+        set -l home_index (contains -i -- --home $argv)
+        if test -n "$home_index"
+            set -l next (math "$home_index + 1")
+            set -l staging "$argv[$next]-system"
+            mkdir -p -- "$staging"; or exit 1
+            set -a argv --system-root "$staging"
+        end
+    end
     fish --no-config "$root/setup.fish" $argv > "$sandbox/output" 2>&1
     set -l result $status
     if string match -rq "Unknown command|^fish:|^Error:" < "$sandbox/output"
@@ -38,6 +49,12 @@ if not string match -q '*+ sudo pacman -Syu --needed niri*' (string collect < "$
     exit 1
 end
 printf 'PASS: package selection preview\n'
+invoke --install --dry-run --packages noctalia-git --configs none --home "$sandbox/preview"
+if not string match -q '*+ sudo pacman -Syu --needed keyd evtest*' (string collect < "$sandbox/output")
+    printf 'FAIL: Noctalia package selection omitted Bongocat dependencies\n' >&2
+    exit 1
+end
+printf 'PASS: Noctalia package installation includes keyd and evtest\n'
 
 # Default deployment omits both asset paths and files.
 mkdir "$sandbox/plain"
@@ -53,10 +70,13 @@ noctalia config validate "$plain"; or exit 1
 invoke --apply --configs noctalia --home "$sandbox/plain"
 expect ! -e "$sandbox/plain/.local/state/dotfiles-backups"
 printf 'PASS: no-image deployment and idempotence\n'
-if string match -q '*keyd-virtual-keyboard*' (string collect < "$plain")
-    printf 'FAIL: keyd device referenced without enabling keyd setup\n' >&2
+if not string match -q '*keyd-virtual-keyboard*' (string collect < "$plain")
+    printf 'FAIL: default Noctalia deployment omitted Bongocat keyboard input\n' >&2
     exit 1
 end
+expect -f "$sandbox/plain-system/etc/keyd/default.conf"
+cmp -s "$root/system/keyd/default.conf" "$sandbox/plain-system/etc/keyd/default.conf"; or exit 1
+printf 'PASS: Noctalia automatically includes generic keyd/Bongocat setup\n'
 
 # Each asset can be selected separately.
 for choice in wallpaper avatar
@@ -101,6 +121,7 @@ mkdir -p "$sandbox/conflict/.config/alacritty"
 printf old > "$sandbox/conflict/.config/alacritty/alacritty.toml"
 printf keep > "$sandbox/conflict/.config/alacritty/unrelated"
 invoke --apply --configs alacritty --home "$sandbox/conflict"
+expect ! -e "$sandbox/conflict-system/etc/keyd/default.conf"
 set -l backup (find "$sandbox/conflict/.local/state/dotfiles-backups" -mindepth 1 -maxdepth 1 -type d)
 expect (cat "$backup/.config/alacritty/alacritty.toml") = old
 expect (cat "$sandbox/conflict/.config/alacritty/unrelated") = keep
@@ -137,9 +158,9 @@ cmp -s "$root/.config/yazi/flavors/noctalia.yazi/tmtheme.xml" \
     "$sandbox/full/.config/yazi/flavors/noctalia.yazi/tmtheme.xml"; or exit 1
 printf 'PASS: Yazi syntax-highlighting theme deployment\n'
 
-# System configuration is opt-in and can be staged without sudo or host services.
+# Noctalia automatically stages system configuration, without a --keyd flag.
 mkdir "$sandbox/keyd-home" "$sandbox/keyd-system"
-invoke --apply --keyd --configs noctalia --home "$sandbox/keyd-home" --system-root "$sandbox/keyd-system"
+invoke --apply --configs noctalia --home "$sandbox/keyd-home" --system-root "$sandbox/keyd-system"
 set -l keyd_config "$sandbox/keyd-system/etc/keyd/default.conf"
 expect -f "$keyd_config"
 cmp -s "$root/system/keyd/default.conf" "$keyd_config"; or exit 1
@@ -152,7 +173,7 @@ if not string match -q '*keyd-virtual-keyboard*' (string collect < "$sandbox/key
     exit 1
 end
 expect -f "$sandbox/keyd-system/etc/udev/rules.d/70-keyd-bongocat.rules"
-invoke --apply --keyd --configs noctalia --home "$sandbox/keyd-home" --system-root "$sandbox/keyd-system"
+invoke --apply --configs noctalia --home "$sandbox/keyd-home" --system-root "$sandbox/keyd-system"
 expect ! -e "$sandbox/keyd-system/var/backups/dotfiles"
 printf 'PASS: generic keyd staging, Bongocat device and repeated deployment\n'
 
@@ -165,7 +186,7 @@ printf 'PASS: EliteBook opt-in and system backup\n'
 
 # Previewing system setup creates no files and executes no services.
 mkdir "$sandbox/keyd-preview-home" "$sandbox/keyd-preview-system"
-invoke --apply --keyd --dry-run --configs noctalia --home "$sandbox/keyd-preview-home" --system-root "$sandbox/keyd-preview-system"
+invoke --apply --dry-run --configs noctalia --home "$sandbox/keyd-preview-home" --system-root "$sandbox/keyd-preview-system"
 expect (count (find "$sandbox/keyd-preview-home" -mindepth 1 -print)) -eq 0
 expect (count (find "$sandbox/keyd-preview-system" -mindepth 1 -print)) -eq 0
 printf 'PASS: keyd preview writes nothing\n'

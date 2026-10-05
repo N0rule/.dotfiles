@@ -21,9 +21,8 @@ The terminal UI lets you choose:
 2. Individual packages to install (including the native `noctalia-git` AUR package).
 3. Individual application configs to deploy.
 4. Wallpaper and profile image independently; **both are off by default**.
-5. Optional keyd/Bongocat system setup and HP EliteBook button mappings.
-   These are separate choices, both off by default; selecting HP mappings
-   also enables the keyd setup.
+5. Optional HP EliteBook button mappings, **off by default**. Bongocat and its
+   keyd keyboard setup are automatically included with the Noctalia config.
 6. Final action: **1. Apply (default)**, **2. Test apply**, **3. Cancel**.
    Enter selects Apply. Test apply prints the plan without changing packages,
    configs or services.
@@ -32,9 +31,11 @@ In each checklist, enter numbers to toggle items, `a` for all, `n` for none,
 Enter to finish, or `q` to cancel. For example, `2 5` toggles rows 2 and 5.
 Nothing is installed or copied before the final action screen. Choose `1` or
 press Enter to apply; choose `2` to preview without making changes.
-Package and config selections are independent: a config can reference an app
-or plugin you chose not to install. Keep existing app settings by deselecting
-its config.
+Keep existing app settings by deselecting its config. Most package and config
+selections are independent. Noctalia includes Bongocat's `keyd` and `evtest`
+dependencies whenever package installation is selected; these are added even
+if individually deselected. Applying the Noctalia config also deploys the keyd
+profile and device-access rule and enables/restarts keyd.
 
 Package installation uses `sudo pacman -Syu --needed`, followed by
 `paru -S --needed` for selected AUR packages. Review the normal package prompts
@@ -94,7 +95,9 @@ Use `--packages none` or `--configs none` for an empty list.
 `--wallpaper` and `--avatar` are independent image options.
 `--home /path/to/existing/test-home` changes the deployment destination;
 package installation still affects the system. The script never changes the
-login shell. Selecting keyd system setup explicitly enables/restarts its service.
+login shell. Applying the Noctalia config includes keyd system setup and
+enables/restarts its service. Config-only deployment requires installed keyd
+and evtest; select package installation too on a fresh machine.
 
 ## Config deployment and backups
 
@@ -127,22 +130,23 @@ in file previews; no Stow command or extra installation step is needed.
 
 ## Keyd, Bongocat and HP EliteBook buttons
 
-`keyd` and `evtest` are in the package checklist. Choose **keyd-bongocat** in
-the system keyboard checklist to configure the virtual keyboard. The generic
+**Bongocat is included by default with Noctalia.** Applying the Noctalia config
+automatically configures keyd's virtual keyboard and device permissions.
+Package installation with Noctalia includes `keyd` and `evtest`. The default
 profile passes keys through and contains no HP button mappings.
 
-Choose **elitebook-buttons** only for this HP EliteBook. It implies keyd setup
-and uses the existing three remaps: monitor button opens the terminal, answer
+Choose **elitebook-buttons** only for this HP EliteBook. It uses the existing
+three remaps: monitor button opens the terminal, answer
 button takes a region screenshot, and hangup button closes the window.
 The captured profile uses a wildcard device match, as on the source system;
 other models can emit different chords, so check `keyd monitor` before using it.
 
 ```fish
 # Preview generic keyd/Bongocat setup without HP remaps.
-fish --no-config setup.fish --apply --configs noctalia --keyd --dry-run
+fish --no-config setup.fish --apply --configs noctalia --dry-run
 
 # Apply generic keyd setup (requires installed keyd and evtest).
-fish --no-config setup.fish --apply --configs noctalia --keyd
+fish --no-config setup.fish --apply --configs noctalia
 
 # Explicitly use the HP EliteBook profile instead.
 fish --no-config setup.fish --apply --configs noctalia --elitebook
@@ -157,10 +161,10 @@ grants the active local session read access only to that virtual device; it
 does not add the user to the broad `input` group. A new login may be needed
 for the session permissions to take effect.
 
-Select the Noctalia config as well to configure the `cat_2` widget's input path.
-Existing GUI overrides still take precedence. Without keyd setup selected,
-the installer omits this input path; keyboard animation then needs a device
-configured manually. Bongocat can also read other input devices directly;
+The Noctalia config includes the `cat_2` widget's virtual-keyboard input path.
+Existing GUI overrides still take precedence. Deselect Noctalia if you want
+to skip its config and automatic keyd setup. The `--keyd` flag remains available
+for standalone backend setup. Bongocat can also read other input devices directly;
 keyd is the chosen backend for these dots, rather than a plugin requirement.
 The plugin requires `evtest` and permission to read its selected devices.
 See the [plugin documentation](https://github.com/noctalia-dev/official-plugins/blob/main/bongocat/README.md).
@@ -169,7 +173,9 @@ For a test deployment, combine `--home <test-home>` with
 `--system-root <test-system-root>`. Both directories must exist. This stages
 system files under the test root and does not run sudo, restart services or
 touch live devices. The script refuses `--keyd --home <test-home>` without a
-test system root to prevent changes to the host during a test.
+test system root when applying to prevent changes to the host during a test.
+This also applies to Noctalia's automatic keyd setup. A dry-run preview is safe
+without a test system root.
 
 ## Noctalia and shell preferences
 
@@ -194,7 +200,7 @@ The snapshot keeps `us,ru,ua` keyboard layouts (Caps Lock cycles), idle timers
 of 2 minutes to turn screens off, 4 to lock and 15 to lock/suspend, and the
 existing Catppuccin desktop theme. Monitor overrides are disabled by default;
 run `niri msg outputs` and edit `.config/niri/cfg/display.kdl` for your hardware.
-The keyd option configures Bongocat's stable virtual keyboard. Lockscreen
+The Noctalia config includes Bongocat's stable virtual keyboard. Lockscreen
 positions can be adjusted through the UI.
 
 After Noctalia GUI changes, export settings you want to retain:

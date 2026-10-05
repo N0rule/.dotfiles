@@ -41,7 +41,7 @@ function usage
         '  --configs niri,noctalia,...       Config selection (default: all)' \
         '  --wallpaper                      Include the wallpaper and its settings' \
         '  --avatar                         Include the profile image and its settings' \
-        '  --keyd                           Configure/start keyd for Bongocat (uses sudo)' \
+        '  --keyd                           Set up keyd separately (automatic with Noctalia)' \
         '  --elitebook                      Enable HP button mappings (implies --keyd)' \
         '  --system-root DIR                Stage system files without touching services' \
         '  --home DIR                       Deploy into an existing test home' \
@@ -325,7 +325,7 @@ function main
                 return 2
         end
         if test "$setup_install" = 1
-            set -g setup_selected_packages (checklist 'Packages (repo + AUR; selected by default)' all $setup_repo $setup_aur)
+            set -g setup_selected_packages (checklist 'Packages (Noctalia includes keyd and evtest automatically)' all $setup_repo $setup_aur)
             or return 0
         end
         if test "$setup_apply" = 1
@@ -335,9 +335,8 @@ function main
             or return 0
             contains -- wallpaper $images; and set -g setup_wallpaper 1
             contains -- profile-image $images; and set -g setup_avatar 1
-            set -l keyboard (checklist 'System keyboard setup (opt-in; EliteBook mappings off by default)' none keyd-bongocat elitebook-buttons)
+            set -l keyboard (checklist 'Optional HP EliteBook button bindings (off by default)' none elitebook-buttons)
             or return 0
-            contains -- keyd-bongocat $keyboard; and set -g setup_keyd 1
             if contains -- elitebook-buttons $keyboard
                 set -g setup_elitebook 1
                 set -g setup_keyd 1
@@ -351,14 +350,26 @@ function main
             return 2
         end
     end
+    # Bongocat is part of the Noctalia configuration, including its keyboard
+    # backend. Only the HP-specific mapping profile requires a separate choice.
+    if test "$setup_apply" = 1; and contains -- noctalia $setup_selected_configs
+        set -g setup_keyd 1
+    end
+    if test "$setup_install" = 1; and begin; test "$setup_keyd" = 1; or contains -- noctalia-git $setup_selected_packages; end
+        for dependency in keyd evtest
+            if not contains -- "$dependency" $setup_selected_packages
+                set -a setup_selected_packages "$dependency"
+            end
+        end
+    end
     test -d "$setup_home"; or begin; fail "Home must already exist: $setup_home"; return 1; end
     set -g setup_home (realpath -e -- "$setup_home"); or return 1
     if test "$setup_keyd" = 1; and test "$setup_apply" != 1
         fail 'Keyd setup requires --apply (or --apply --dry-run)'
         return 2
     end
-    if test "$setup_keyd" = 1; and test "$setup_system_root" = /; and test "$setup_home" != (realpath -e -- "$HOME")
-        fail 'Use --system-root for keyd tests with --home; otherwise keyd would change the host'
+    if test "$setup_keyd" = 1; and test "$setup_dry" = 0; and test "$setup_system_root" = /; and test "$setup_home" != (realpath -e -- "$HOME")
+        fail 'Noctalia includes keyd setup. Use --system-root when applying to a test --home to avoid host changes'
         return 2
     end
     set -g setup_config_home "$setup_home/.config"
