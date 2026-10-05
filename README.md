@@ -1,5 +1,5 @@
+![Setup Image](https://github.com/user-attachments/assets/d4b02dc2-1519-451c-8be5-b5706c4aadb4)
 # CachyOS · Niri · native Noctalia
-
 Personal dotfiles for CachyOS, Niri and native C++ Noctalia v5, refreshed from
 this machine on 2026-10-05. The installer is a **Fish script** using standard
 Linux tools. Python, GNU Stow and an extra UI package are not required.
