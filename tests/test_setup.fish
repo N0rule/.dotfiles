@@ -173,6 +173,8 @@ if not string match -q '*keyd-virtual-keyboard*' (string collect < "$sandbox/key
     exit 1
 end
 expect -f "$sandbox/keyd-system/etc/udev/rules.d/70-keyd-bongocat.rules"
+expect ! -e "$sandbox/keyd-system/etc/pam.d"
+expect ! -e "$sandbox/keyd-system/usr/share/sddm"
 invoke --apply --configs noctalia --home "$sandbox/keyd-home" --system-root "$sandbox/keyd-system"
 expect ! -e "$sandbox/keyd-system/var/backups/dotfiles"
 printf 'PASS: generic keyd staging, Bongocat device and repeated deployment\n'
@@ -183,6 +185,37 @@ cmp -s "$root/system/keyd/elitebook.conf" "$keyd_config"; or exit 1
 set -l system_backup (find "$sandbox/keyd-system/var/backups/dotfiles" -mindepth 1 -maxdepth 1 -type d)
 cmp -s "$root/system/keyd/default.conf" "$system_backup/etc/keyd/default.conf"; or exit 1
 printf 'PASS: EliteBook opt-in and system backup\n'
+
+# The EliteBook option also stages fingerprint login for sudo, polkit and SDDM.
+for pam in sudo polkit-1 sddm
+    expect -f "$sandbox/keyd-system/etc/pam.d/$pam"
+    cmp -s "$root/system/pam/$pam" "$sandbox/keyd-system/etc/pam.d/$pam"; or exit 1
+end
+set -l mask "$sandbox/keyd-system/etc/systemd/system/fprintd.service"
+expect -L "$mask"
+expect (readlink -- "$mask") = /dev/null
+printf 'PASS: EliteBook fingerprint PAM rules and fprintd mask\n'
+
+# Fingerprint packages are added automatically with the EliteBook option.
+mkdir "$sandbox/fingerprint-preview"
+invoke --install --apply --dry-run --packages niri --configs none --elitebook --home "$sandbox/fingerprint-preview"
+if not string match -q '*paru -S --needed open-fprintd fprintd-clients-git python-validity*' (string collect < "$sandbox/output")
+    printf 'FAIL: EliteBook fingerprint packages missing from plan\n' >&2
+    exit 1
+end
+printf 'PASS: EliteBook fingerprint package selection\n'
+
+# The Noctalia SDDM theme is staged only when requested.
+mkdir "$sandbox/sddm-home" "$sandbox/sddm-system"
+invoke --apply --sddm --configs none --home "$sandbox/sddm-home" --system-root "$sandbox/sddm-system"
+set -l theme "$sandbox/sddm-system/usr/share/sddm/themes/sddm-noctalia-theme"
+expect -f "$theme/Main.qml"
+expect -f "$theme/Commons/Settings.conf"
+expect (count (find "$theme" -type f)) = (count (find "$root/system/sddm/themes/sddm-noctalia-theme" -type f))
+expect -f "$sandbox/sddm-system/etc/sddm.conf.d/theme.conf"
+expect -f "$sandbox/sddm-system/etc/sddm.conf.d/virtualkbd.conf"
+expect ! -e "$sandbox/sddm-system/etc/pam.d"
+printf 'PASS: Noctalia SDDM theme staging\n'
 
 # Previewing system setup creates no files and executes no services.
 mkdir "$sandbox/keyd-preview-home" "$sandbox/keyd-preview-system"

@@ -6,3 +6,8 @@ brave-origin-bin
 bibata-cursor-theme-bin
 # Qt configuration utility used on the source system (provides qt6ct)
 qt6ct-kde
+# HP EliteBook fingerprint login (added automatically with the EliteBook option)
+# python-validity may need a device-specific fork for newer Validity sensors.
+open-fprintd
+fprintd-clients-git
+python-validity

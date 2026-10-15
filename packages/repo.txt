@@ -12,7 +12,9 @@ pipewire-alsa
 pipewire-pulse
 wireplumber
 gnome-keyring
-polkit-kde-agent
+polkit
+# Login manager for the Noctalia SDDM theme
+sddm
 brightnessctl
 ddcutil
 # Bongocat keyboard input through keyd's virtual keyboard

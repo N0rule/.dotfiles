@@ -21,9 +21,11 @@ The terminal UI lets you choose:
 2. Individual packages to install (including the native `noctalia-git` AUR package).
 3. Individual application configs to deploy.
 4. Wallpaper and profile image independently; **both are off by default**.
-5. Optional HP EliteBook button mappings, **off by default**. Bongocat and its
-   keyd keyboard setup are automatically included with the Noctalia config.
-6. Final action: **1. Apply (default)**, **2. Test apply**, **3. Cancel**.
+5. Optional HP EliteBook extras — the three button mappings and fingerprint
+   login; **off by default**. Bongocat and its keyd keyboard setup are
+   automatically included with the Noctalia config.
+6. Optional Noctalia SDDM theme; **off by default**.
+7. Final action: **1. Apply (default)**, **2. Test apply**, **3. Cancel**.
    Enter selects Apply. Test apply prints the plan without changing packages,
    configs or services.
 
@@ -92,7 +94,8 @@ fish --no-config setup.fish --help
 Explicit command-line `--install` and `--apply` execute directly; add
 `--dry-run` to preview. Package/config lists default to all when omitted.
 Use `--packages none` or `--configs none` for an empty list.
-`--wallpaper` and `--avatar` are independent image options.
+`--wallpaper`, `--avatar` and `--sddm` are independent options; `--elitebook`
+implies `--keyd` and adds fingerprint login.
 `--home /path/to/existing/test-home` changes the deployment destination;
 package installation still affects the system. The script never changes the
 login shell. Applying the Noctalia config includes keyd system setup and
@@ -128,7 +131,7 @@ Yazi's `flavors/noctalia.yazi/tmtheme.xml` is part of the selected Yazi config
 and is copied along with `flavor.toml`. Yazi uses it for syntax highlighting
 in file previews; no Stow command or extra installation step is needed.
 
-## Keyd, Bongocat and HP EliteBook buttons
+## Keyd, Bongocat and HP EliteBook extras
 
 **Bongocat is included by default with Noctalia.** Applying the Noctalia config
 automatically configures keyd's virtual keyboard and device permissions.
@@ -137,9 +140,10 @@ profile passes keys through and contains no HP button mappings.
 
 Choose **elitebook-buttons** only for this HP EliteBook. It uses the existing
 three remaps: monitor button opens the terminal, answer
-button takes a region screenshot, and hangup button closes the window.
-The captured profile uses a wildcard device match, as on the source system;
-other models can emit different chords, so check `keyd monitor` before using it.
+button takes a region screenshot, and hangup button closes the window, and it
+also turns on [fingerprint login](#fingerprint-login) for this machine. The
+captured profile uses a wildcard device match, as on the source system; other
+models can emit different chords, so check `keyd monitor` before using it.
 
 ```fish
 # Preview generic keyd/Bongocat setup without HP remaps.
@@ -172,10 +176,55 @@ See the [plugin documentation](https://github.com/noctalia-dev/official-plugins/
 For a test deployment, combine `--home <test-home>` with
 `--system-root <test-system-root>`. Both directories must exist. This stages
 system files under the test root and does not run sudo, restart services or
-touch live devices. The script refuses `--keyd --home <test-home>` without a
-test system root when applying to prevent changes to the host during a test.
-This also applies to Noctalia's automatic keyd setup. A dry-run preview is safe
-without a test system root.
+touch live devices. The script refuses system setup (`--keyd`, `--elitebook`,
+`--sddm`, or Noctalia's automatic keyd setup) with a test `--home` and no test
+system root when applying, to prevent changes to the host during a test. A
+dry-run preview is safe without a test system root.
+
+## Fingerprint login
+
+The EliteBook extras also set up fingerprint-first login for `sudo`, polkit and
+SDDM. It is specific to this machine's Validity sensor, so it is never applied
+on its own:
+
+- AUR packages, added automatically: `open-fprintd`, `fprintd-clients-git` and
+  `python-validity`.
+- `system/pam/{sudo,polkit-1,sddm}` are copied to `/etc/pam.d/`, each with
+  `auth sufficient pam_fprintd.so ...` ahead of the password stack, so the
+  password is still a fallback.
+- `fprintd.service` is masked (`ln -s /dev/null`) because `open-fprintd` owns
+  `net.reactivated.Fprint`; masking clears the "Two services allocated for the
+  same bus name" error.
+
+The PAM files are snapshots, not edits, so review them if your `system-auth`
+stack differs. Existing files are backed up under
+`/var/backups/dotfiles/<timestamp>/`. Services are only restarted when applying
+to `/`; a test `--system-root` stages the PAM rules and the mask only.
+
+The AUR `python-validity` tracks upstream, which no longer supports every
+Validity sensor. Build your own fork and repackage it if `python3-validity`
+fails to start. Enroll a finger after the first login, then test without
+holding a valid `sudo` timestamp:
+
+```fish
+fprintd-enroll --finger right-index-finger
+sudo -k; sudo -v
+```
+
+## SDDM theme
+
+The optional **sddm-theme** choice installs the vendored
+`sddm-noctalia-theme` (custom wallpaper and Catppuccin scheme) to
+`/usr/share/sddm/themes/`, and writes `/etc/sddm.conf.d/theme.conf` selecting
+it plus the `qtvirtualkeyboard` setting:
+
+```fish
+fish --no-config setup.fish --apply --sddm
+```
+
+SDDM is never restarted, so the theme appears at the next login. To remove it,
+delete `/usr/share/sddm/themes/sddm-noctalia-theme` and restore `theme.conf`
+from the printed backup path.
 
 ## Noctalia and shell preferences
 
@@ -224,16 +273,18 @@ ones you need:
 sudo systemctl enable --now NetworkManager.service bluetooth.service
 systemctl --user enable --now pipewire.socket pipewire-pulse.socket wireplumber.service
 systemctl --user enable --now gnome-keyring-daemon.socket
-systemctl --user enable --now polkit-kde.service
 xdg-user-dirs-update
 mkdir -p ~/Pictures/Screenshots
 chsh -s /usr/bin/fish
 ```
 
 Select **Niri** in your existing login manager, or use `niri-session` from a
-TTY. Niri starts Noctalia automatically. Use one Polkit agent: the commands
-above reproduce this machine's KDE agent service; disable it if you enable
-Noctalia's agent instead.
+TTY. Niri starts Noctalia automatically. Authentication uses **Noctalia's
+Polkit Agent plugin**, not `polkit-kde-agent`: install the `polkit-agent`
+plugin from Noctalia's plugin list and enable it in Settings (the deployed
+`config.toml` sets `polkit_agent = true`). Keep only one polkit agent — if
+`polkit-kde.service` exists, disable it with
+`systemctl --user disable --now polkit-kde.service`.
 
 For tmux plugins, install TPM once:
 
@@ -257,11 +308,13 @@ fish --no-config tests/test_setup.fish
 These checks deploy into temporary homes, exercising optional images, repeated
 deployment, backups and shared directory links. They also load the deployed
 image settings through Noctalia with fresh state, decode both PNGs using its
-theme tool, and validate the deployed Niri config. They do not install packages
-or test a complete fresh CachyOS login; graphics hardware and future package
-versions still need validation on the new machine. Select both `noctalia` in
-the configs checklist and the wallpaper option to apply the wallpaper settings.
-Selecting only the image copies it without changing the shell's configuration.
+theme tool, and validate the deployed Niri config. System setup is staged under
+a test system root: the keyd profile, the fingerprint PAM rules and fprintd
+mask, and the SDDM theme. They do not install packages or test a complete fresh
+CachyOS login; graphics hardware and future package versions still need
+validation on the new machine. Select both `noctalia` in the configs checklist
+and the wallpaper option to apply the wallpaper settings. Selecting only the
+image copies it without changing the shell's configuration.
 
 Push committed changes to GitHub before following the clone instructions on
 a new machine, or copy the updated repository there directly. A clone from

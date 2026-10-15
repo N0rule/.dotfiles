@@ -9,8 +9,10 @@ set -g setup_wallpaper 0
 set -g setup_avatar 0
 set -g setup_keyd 0
 set -g setup_elitebook 0
+set -g setup_fingerprint 0
+set -g setup_sddm 0
 set -g setup_system_root /
-source "$setup_root/scripts/keyd.fish"
+source "$setup_root/scripts/system.fish"
 set -g setup_configs niri noctalia fish alacritty tmux atuin btop fastfetch yazi
 set -g setup_repo
 set -g setup_aur
@@ -42,7 +44,8 @@ function usage
         '  --wallpaper                      Include the wallpaper and its settings' \
         '  --avatar                         Include the profile image and its settings' \
         '  --keyd                           Set up keyd separately (automatic with Noctalia)' \
-        '  --elitebook                      Enable HP button mappings (implies --keyd)' \
+        '  --elitebook                      HP mappings and fingerprint login (implies --keyd)' \
+        '  --sddm                           Install the Noctalia SDDM theme and config' \
         '  --system-root DIR                Stage system files without touching services' \
         '  --home DIR                       Deploy into an existing test home' \
         '  --dry-run                        Print the plan without making changes' \
@@ -233,7 +236,7 @@ function validate_configs
     noctalia config validate "$setup_root/.config/noctalia/config.toml"; or return 1
     fish --no-config -n "$setup_root/.config/fish/config.fish"; or return 1
     fish --no-config -n "$setup_root/setup.fish"; or return 1
-    fish --no-config -n "$setup_root/scripts/keyd.fish"; or return 1
+    fish --no-config -n "$setup_root/scripts/system.fish"; or return 1
     if command -q keyd
         keyd check "$setup_root/system/keyd/default.conf" "$setup_root/system/keyd/elitebook.conf"; or return 1
     end
@@ -244,7 +247,7 @@ function main
     if test (count $argv) = 0
         set interactive 1
     end
-    argparse h/help install apply dry-run check list wallpaper avatar keyd elitebook 'system-root=' 'home=' 'packages=' 'configs=' -- $argv; or return 2
+    argparse h/help install apply dry-run check list wallpaper avatar keyd elitebook sddm 'system-root=' 'home=' 'packages=' 'configs=' -- $argv; or return 2
     if test (count $argv) -gt 0
         fail "Unexpected argument: $argv"
         return 2
@@ -277,7 +280,9 @@ function main
     if set -q _flag_elitebook
         set -g setup_elitebook 1
         set -g setup_keyd 1
+        set -g setup_fingerprint 1
     end
+    set -q _flag_sddm; and set -g setup_sddm 1
     if set -q _flag_system_root
         test -d "$_flag_system_root"; or begin; fail 'System staging directory must already exist'; return 1; end
         set -g setup_system_root (realpath -e -- "$_flag_system_root"); or return 1
@@ -335,12 +340,16 @@ function main
             or return 0
             contains -- wallpaper $images; and set -g setup_wallpaper 1
             contains -- profile-image $images; and set -g setup_avatar 1
-            set -l keyboard (checklist 'Optional HP EliteBook button bindings (off by default)' none elitebook-buttons)
+            set -l keyboard (checklist 'Optional HP EliteBook extras: button mappings + fingerprint login (off by default)' none elitebook-buttons)
             or return 0
             if contains -- elitebook-buttons $keyboard
                 set -g setup_elitebook 1
                 set -g setup_keyd 1
+                set -g setup_fingerprint 1
             end
+            set -l login (checklist 'Optional Noctalia SDDM theme (off by default)' none sddm-theme)
+            or return 0
+            contains -- sddm-theme $login; and set -g setup_sddm 1
         end
     else if test "$setup_install" = 0; and test "$setup_apply" = 0
         if test "$setup_dry" = 1
@@ -362,14 +371,27 @@ function main
             end
         end
     end
+    # The EliteBook fingerprint login needs the open-fprintd stack and its PAM
+    # client, which are all AUR packages.
+    if test "$setup_install" = 1; and test "$setup_fingerprint" = 1
+        for dependency in open-fprintd fprintd-clients-git python-validity
+            if not contains -- "$dependency" $setup_selected_packages
+                set -a setup_selected_packages "$dependency"
+            end
+        end
+    end
     test -d "$setup_home"; or begin; fail "Home must already exist: $setup_home"; return 1; end
     set -g setup_home (realpath -e -- "$setup_home"); or return 1
     if test "$setup_keyd" = 1; and test "$setup_apply" != 1
         fail 'Keyd setup requires --apply (or --apply --dry-run)'
         return 2
     end
-    if test "$setup_keyd" = 1; and test "$setup_dry" = 0; and test "$setup_system_root" = /; and test "$setup_home" != (realpath -e -- "$HOME")
-        fail 'Noctalia includes keyd setup. Use --system-root when applying to a test --home to avoid host changes'
+    if test "$setup_sddm" = 1; and test "$setup_apply" != 1
+        fail 'SDDM setup requires --apply (or --apply --dry-run)'
+        return 2
+    end
+    if test "$setup_dry" = 0; and test "$setup_system_root" = /; and test "$setup_home" != (realpath -e -- "$HOME"); and begin; test "$setup_keyd" = 1; or test "$setup_fingerprint" = 1; or test "$setup_sddm" = 1; end
+        fail 'System setup requires --system-root when applying to a test --home'
         return 2
     end
     set -g setup_config_home "$setup_home/.config"
@@ -396,9 +418,10 @@ function main
         "$package_summary" "$config_summary" \
         "$setup_wallpaper" "$setup_avatar" "$setup_home"
     printf 'Package installation: %s   Config deployment: %s\n' "$setup_install" "$setup_apply"
-    printf 'Keyd/Bongocat system setup: %s   HP EliteBook remaps: %s\n' "$setup_keyd" "$setup_elitebook"
-    if test "$setup_keyd" = 1
-        printf 'System destination: %s (existing keyd default.conf will be backed up/replaced if different)\n' "$setup_system_root"
+    printf 'Keyd/Bongocat system setup: %s   HP EliteBook extras: %s\n' "$setup_keyd" "$setup_elitebook"
+    printf 'Fingerprint login: %s   Noctalia SDDM theme: %s\n' "$setup_fingerprint" "$setup_sddm"
+    if test "$setup_keyd" = 1; or test "$setup_fingerprint" = 1; or test "$setup_sddm" = 1
+        printf 'System destination: %s (existing files will be backed up/replaced if different)\n' "$setup_system_root"
     end
     printf 'Configs can reference apps/plugins you skip installing. Noctalia GUI overrides remain in effect.\n'
     if test "$setup_apply" = 1; and begin; test "$setup_wallpaper" = 1; or test "$setup_avatar" = 1; end
@@ -450,6 +473,12 @@ function main
     if test "$setup_apply" = 1
         if test "$setup_keyd" = 1
             setup_keyd_system; or return 1
+        end
+        if test "$setup_fingerprint" = 1
+            setup_fingerprint_system; or return 1
+        end
+        if test "$setup_sddm" = 1
+            setup_sddm_system; or return 1
         end
         deploy; or return 1
     end
