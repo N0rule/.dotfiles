@@ -118,6 +118,7 @@ binds {
     Mod+T                               { toggle-window-floating; }
     Mod+F                               { maximize-column; }
     Mod+Shift+F                         { fullscreen-window; }
+    Mod+Ctrl+Shift+F                    { toggle-windowed-fullscreen; }
     Mod+W                               { toggle-column-tabbed-display; }
 
     // ─── Screenshots ───

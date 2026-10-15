@@ -8,7 +8,15 @@
         default-column-width { proportion 0.75; }
     }
 
-     // if you use steam you will probably like these
+    // btop needs room for its graphs and tables, so give it its own big column
+    // instead of squeezing it into a tile.
+    window-rule {
+        match app-id="Alacritty" title=r#"^btop$"#
+        default-column-width { fixed 1280; }
+        default-window-height { fixed 760; }
+    }
+
+    // if you use steam you will probably like these
     window-rule {
         match app-id="steam"
         exclude title=r#"^[Ss]team$"#
