@@ -1,5 +1,7 @@
 # Native C++ Noctalia, providing /usr/bin/noctalia
 noctalia-git
+# Noctalia greetd greeter (replaces SDDM at the login screen)
+noctalia-greeter-git
 # Browser launched by Mod+B
 brave-origin-bin
 # Cursor selected in Niri

@@ -94,7 +94,7 @@ fish --no-config setup.fish --help
 Explicit command-line `--install` and `--apply` execute directly; add
 `--dry-run` to preview. Package/config lists default to all when omitted.
 Use `--packages none` or `--configs none` for an empty list.
-`--wallpaper`, `--avatar` and `--sddm` are independent options; `--elitebook`
+`--wallpaper` and `--avatar` are independent options; `--elitebook`
 implies `--keyd` and adds fingerprint login.
 `--home /path/to/existing/test-home` changes the deployment destination;
 package installation still affects the system. The script never changes the
@@ -177,21 +177,27 @@ For a test deployment, combine `--home <test-home>` with
 `--system-root <test-system-root>`. Both directories must exist. This stages
 system files under the test root and does not run sudo, restart services or
 touch live devices. The script refuses system setup (`--keyd`, `--elitebook`,
-`--sddm`, or Noctalia's automatic keyd setup) with a test `--home` and no test
+or Noctalia's automatic keyd setup) with a test `--home` and no test
 system root when applying, to prevent changes to the host during a test. A
 dry-run preview is safe without a test system root.
 
 ## Fingerprint login
 
-The EliteBook extras also set up fingerprint-first login for `sudo`, polkit and
-SDDM. It is specific to this machine's Validity sensor, so it is never applied
-on its own:
+The EliteBook extras also set up fingerprint-first login for `sudo` and
+polkit. It is specific to this machine's Validity sensor, so it is never
+applied on its own:
 
 - AUR packages, added automatically: `open-fprintd`, `fprintd-clients-git` and
   `python-validity`.
-- `system/pam/{sudo,polkit-1,sddm}` are copied to `/etc/pam.d/`, each with
+- `system/pam/{sudo,polkit-1}` are copied to `/etc/pam.d/`, each with
   `auth sufficient pam_fprintd.so ...` ahead of the password stack, so the
   password is still a fallback.
+- `system/pam/greetd` is copied to `/etc/pam.d/greetd` for the login screen:
+  password-first so the keyring unlocks when you type, with `pam_fprintd` as
+  the fallback after an empty submission. Set
+  `[auth].allow_empty_password = true` in
+  `/var/lib/noctalia-greeter/greeter.toml` so an Enter press starts the
+  fingerprint prompt.
 - `fprintd.service` is masked (`ln -s /dev/null`) because `open-fprintd` owns
   `net.reactivated.Fprint`; masking clears the "Two services allocated for the
   same bus name" error.
@@ -211,20 +217,32 @@ fprintd-enroll --finger right-index-finger
 sudo -k; sudo -v
 ```
 
-## SDDM theme
+## Login screen (Noctalia greeter)
 
-The optional **sddm-theme** choice installs the vendored
-`sddm-noctalia-theme` (custom wallpaper and Catppuccin scheme) to
-`/usr/share/sddm/themes/`, and writes `/etc/sddm.conf.d/theme.conf` selecting
-it plus the `qtvirtualkeyboard` setting:
+The login screen is greetd running the Noctalia greeter. Select `greetd` and
+`noctalia-greeter-git` in the package lists, then configure greetd:
 
-```fish
-fish --no-config setup.fish --apply --sddm
+```toml
+[terminal]
+vt = 1
+
+[default_session]
+command = "/usr/bin/noctalia-greeter-session"
+user = "greeter"
 ```
 
-SDDM is never restarted, so the theme appears at the next login. To remove it,
-delete `/usr/share/sddm/themes/sddm-noctalia-theme` and restore `theme.conf`
-from the printed backup path.
+Compare with the installed `/etc/greetd/config.toml` before changing it, and
+switch services so greetd owns the login screen:
+
+```fish
+sudo systemctl disable --now sddm
+sudo systemctl enable --now greetd
+```
+
+The greeter's declarative settings (wallpaper, palette, monitor layout, cursor)
+live in `/var/lib/noctalia-greeter/greeter.toml`; appearance sync from Noctalia
+writes `sync.toml` and the wallpaper files instead, and avatars come from
+AccountsService.
 
 ## Noctalia and shell preferences
 

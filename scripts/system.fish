@@ -101,10 +101,12 @@ end
 
 function setup_fingerprint_system
     # Fingerprint-first login for this HP EliteBook: pam_fprintd ahead of the
-    # password stack for sudo, polkit and SDDM, with the stock fprintd masked so
-    # open-fprintd owns net.reactivated.Fprint.
+    # password stack for sudo and polkit, with the stock fprintd masked so
+    # open-fprintd owns net.reactivated.Fprint. greetd keeps the password step
+    # first and adds keyring unlock plus a fprintd fallback after an empty
+    # submission ([auth].allow_empty_password in greeter.toml).
     system_begin
-    for file in sudo polkit-1 sddm
+    for file in sudo polkit-1 greetd
         system_copy "$setup_root/system/pam/$file" "etc/pam.d/$file"; or return 1
     end
     system_mask etc/systemd/system/fprintd.service; or return 1
@@ -117,28 +119,5 @@ function setup_fingerprint_system
     run_command sudo systemctl restart python3-validity.service; or return 1
     if test "$setup_dry" = 0; and not command -q fprintd-list
         printf 'fprintd-list missing; install fprintd-clients-git, then enroll with fprintd-enroll.\n'
-    end
-end
-
-function setup_sddm_system
-    # Noctalia SDDM theme plus the config that selects it. The theme applies on
-    # the next login; SDDM is never restarted from here.
-    system_begin
-    set -l theme_root "$setup_root/system/sddm/themes"
-    for source in (find "$theme_root" -type f | sort)
-        set -l relative (string replace "$theme_root/" '' -- "$source")
-        system_copy "$source" "usr/share/sddm/themes/$relative"; or return 1
-    end
-    set -l conf_root "$setup_root/system/sddm/conf.d"
-    for source in (find "$conf_root" -type f | sort)
-        set -l relative (string replace "$conf_root/" '' -- "$source")
-        system_copy "$source" "etc/sddm.conf.d/$relative"; or return 1
-    end
-    if test "$setup_system_root" != /
-        printf 'Staged the SDDM theme and config only; host services unchanged.\n'
-        return 0
-    end
-    if test "$setup_dry" = 0; and not command -q sddm
-        printf 'sddm is missing; install it for the theme to appear at the next login.\n'
     end
 end

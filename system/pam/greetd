@@ -1,0 +1,21 @@
+#%PAM-1.0
+# Contrast with sudo/polkit-1 above: the greeter keeps the password step first
+# so the login keyring unlocks with a typed password, and pam_fprintd only
+# takes over after an empty submission or a failed password attempt.
+
+auth       required     pam_securetty.so
+auth       requisite    pam_nologin.so
+auth [success=1 new_authtok_reqd=1 default=ignore] pam_unix.so try_first_pass likeauth nullok
+auth       sufficient   pam_fprintd.so
+
+auth       include      system-local-login
+-auth      optional     pam_gnome_keyring.so
+
+account    include      system-local-login
+
+password   include      system-local-login
+-password  optional     pam_gnome_keyring.so    use_authtok
+
+session    optional     pam_keyinit.so          force revoke
+session    include      system-local-login
+-session   optional     pam_gnome_keyring.so    auto_start

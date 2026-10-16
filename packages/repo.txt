@@ -13,8 +13,8 @@ pipewire-pulse
 wireplumber
 gnome-keyring
 polkit
-# Login manager for the Noctalia SDDM theme
-sddm
+# Noctalia greeter on greetd (theme ships in the noctalia-greeter-git package)
+greetd
 brightnessctl
 ddcutil
 # Bongocat keyboard input through keyd's virtual keyboard
