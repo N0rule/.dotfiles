@@ -22,6 +22,7 @@ keyd
 evtest
 # Terminal and shell
 git
+python
 paru
 cachyos-fish-config
 fish

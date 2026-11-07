@@ -4,7 +4,8 @@
   "logo": {
     "type": "file",
     "source": "~/.config/fastfetch/logo.txt",
-    "padding": { "top": 1, "left": 1 },
+    "padding": { "top": 4, "left": 1, "right": 2 },
+    "printRemaining": true,
     "color": {
       "1": "light_black",
       "2": "light_white"
@@ -13,55 +14,63 @@
 
   "display": {
     "separator": "  ",
-    "key": { "width": 14 },
-    "color": {
-      "keys": "light_magenta",
-      "title": "magenta"
-    }
+    "key": { "width": 18 },
+    "brightColor": true,
+    "disableLinewrap": true
   },
 
   "modules": [
-    "title",
-    { "type": "separator", "string": "─" },
+    "break",
+    { "type": "colors", "key": " ", "paddingLeft": 4, "symbol": "circle" },
 
-    { "type": "os",       "key": "󰣇  OS"       },
-    { "type": "kernel",   "key": "󰌢  Kernel"    },
-    { "type": "uptime",   "key": "󱑀  Uptime"    },
-    { "type": "wm",       "key": "󰕮  WM"        },
-    { "type": "theme",    "key": "󰟡  Theme"      },
-    { "type": "icons",    "key": "󰀻  Icons"      },
-    { "type": "shell",    "key": "󱆃  Shell"      },
-    { "type": "terminal", "key": "󰆍  Terminal"   },
-    { "type": "packages", "key": "󰏗  Packages"   },
+    "break",
 
-    { "type": "separator", "string": "─" },
+    { "type": "os",       "key": "╭─ 󰣇  OS:",       "keyColor": "magenta" },
+    { "type": "kernel",   "key": "├─ 󰌢  Kernel:",   "keyColor": "magenta", "format": "{release}" },
+    { "type": "wm",       "key": "├─ 󰕮  WM:",       "keyColor": "magenta", "format": "{pretty-name}" },
+    { "type": "theme",    "key": "├─ 󰟡  Theme:",    "keyColor": "magenta" },
+    { "type": "icons",    "key": "├─ 󰀻  Icons:",    "keyColor": "magenta" },
+    { "type": "terminal", "key": "├─ 󰆍  Terminal:", "keyColor": "magenta" },
+    { "type": "terminalfont", "key": "├─ 󰛖  Font:", "keyColor": "magenta" },
+    { "type": "shell",    "key": "├─ 󱆃  Shell:",    "keyColor": "magenta" },
+    { "type": "packages", "key": "╰─ 󰏗  Packages:", "keyColor": "magenta" },
+
+    "break",
+
+    { "type": "host",     "key": "╭─ 󰟀  PC:",       "keyColor": "yellow" },
+    { "type": "cpu",      "key": "├─ 󰻠  CPU:",      "keyColor": "yellow" },
+    { "type": "gpu",      "key": "├─ 󰍛  GPU:",      "keyColor": "yellow" },
+    {
+      "type": "display",  "key": "├─ 󰍹  Display:",  "keyColor": "yellow",
+      "format": "{width}x{height} @ {refresh-rate} Hz ({name})"
+    },
+    {
+      "type": "disk",     "key": "├─ 󰋊  Storage:",  "keyColor": "yellow",
+      "folders": "/",
+      "format": "{size-used} / {size-total} ({size-percentage}) [{filesystem}]"
+    },
+    { "type": "memory",   "key": "├─ 󰒋  Memory:",   "keyColor": "yellow" },
+    { "type": "swap",     "key": "├─ 󰓡  Swap:",     "keyColor": "yellow" },
+    {
+      "type": "battery",  "key": "├─ 󰁹  Battery:",  "keyColor": "yellow",
+      "format": "{4} [{5}]"
+    },
+    {
+      "type": "localip",  "key": "╰─ 󰩟  Local IP:", "keyColor": "yellow",
+      "showIpv4": true,   "showIpv6": false
+    },
+
+    "break",
 
     {
-      "type": "display",  "key": "󰍹  Display",
-      "compactType": "original-with-scaled-resolution"
+      "type": "disk",     "key": "╭─ 󰃭  OS Age:",   "keyColor": "green",
+      "folders": "/",
+      "format": "{days} days"
     },
-    { "type": "cpu",     "key": "󰻠  CPU"        },
-    { "type": "gpu",     "key": "󰍛  GPU"        },
-    {
-      "type": "memory",  "key": "󰒋  Memory",
-      "format": "{used} / {total} ({percentage})",
-      "percent": { "green": 30, "yellow": 70 }
-    },
-    {
-      "type": "disk",    "key": "󰋊  Disk",
-      "folders": "/",    "percent": { "green": 30, "yellow": 70 }
-    },
-    {
-      "type": "battery", "key": "󰁹  Battery",
-      "format": "{4} [{5}]",
-      "percent": { "red": 30, "yellow": 60, "green": 100 }
-    },
-    {
-      "type": "localip", "key": "󰩟  Local IP",
-      "showIpv4": true, "showIpv6": false
-    },
-    
-    { "type": "separator", "string": "─" },
-    { "type": "colors", "paddingLeft": 4, "symbol": "circle" }
+    { "type": "uptime",   "key": "╰─ 󱑀  Uptime:",   "keyColor": "green" },
+
+    "break",
+
+    { "type": "colors", "key": " ", "paddingLeft": 4, "symbol": "circle" }
   ]
 }

@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+"""Follow the focused workspace with Brave PiP, without changing focus."""
+import fcntl
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+
+
+def main():
+    cache = Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache"))
+    cache.mkdir(parents=True, exist_ok=True)
+    with (cache / "pip-follow.lock").open("a") as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            return 0
+        windows, workspaces = {}, {}
+        focused = None
+        # Initial snapshots come from the stream, avoiding racy seed queries.
+        with subprocess.Popen(
+            ["niri", "msg", "--json", "event-stream"],
+            stdout=subprocess.PIPE, text=True, bufsize=1,
+        ) as stream:
+            try:
+                for line in stream.stdout:
+                    event = json.loads(line)
+                    if "WindowsChanged" in event:
+                        windows = {w["id"]: w for w in event["WindowsChanged"]["windows"]}
+                    elif "WindowOpenedOrChanged" in event:
+                        window = event["WindowOpenedOrChanged"]["window"]
+                        windows[window["id"]] = window
+                    elif "WindowClosed" in event:
+                        windows.pop(event["WindowClosed"]["id"], None)
+                    elif "WorkspacesChanged" in event:
+                        workspaces = {w["id"]: w for w in event["WorkspacesChanged"]["workspaces"]}
+                        focused = next((w["id"] for w in workspaces.values() if w.get("is_focused")), None)
+                    elif event.get("WorkspaceActivated", {}).get("focused"):
+                        target = event["WorkspaceActivated"]["id"]
+                        if target == focused or target not in workspaces:
+                            continue
+                        focused = target
+                        for window in windows.values():
+                            if (window.get("app_id") != "brave-origin"
+                                    or not re.fullmatch(r"picture[ -]in[ -]picture", window.get("title") or "", re.I)
+                                    or not window.get("is_floating")
+                                    or window.get("workspace_id") == target):
+                                continue
+                            result = subprocess.run(
+                                ["niri", "msg", "action", "move-window-to-workspace",
+                                 "--window-id", str(window["id"]), "--focus", "false",
+                                 str(workspaces[target]["idx"])],
+                                capture_output=True, text=True,
+                            )
+                            if result.returncode == 0:
+                                window["workspace_id"] = target
+                            else:
+                                print(result.stderr, file=sys.stderr)
+            finally:
+                if stream.poll() is None:
+                    stream.terminate()
+            return stream.wait()
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except (OSError, ValueError) as error:
+        print(f"pip-follow: {error}", file=sys.stderr)
+        sys.exit(1)

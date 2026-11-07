@@ -2,3 +2,7 @@
 // https://github.com/YaLTeR/niri/wiki/Configuration:-Miscellaneous#spawn-sh-at-startup
 //
     spawn-sh-at-startup "noctalia"
+
+// Keeps Brave's picture-in-picture window on the workspace you switch to
+// (niri has no sticky windows yet, so this emulates it over the IPC).
+    spawn-sh-at-startup "exec \"${XDG_CONFIG_HOME:-$HOME/.config}/niri/scripts/pip-follow\""

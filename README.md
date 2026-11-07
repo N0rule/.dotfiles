@@ -2,7 +2,8 @@
 # CachyOS · Niri · native Noctalia
 Personal dotfiles for CachyOS, Niri and native C++ Noctalia v5, refreshed from
 this machine on 2026-10-05. The installer is a **Fish script** using standard
-Linux tools. Python, GNU Stow and an extra UI package are not required.
+Linux tools. GNU Stow and an extra UI package are not required. Niri's Brave
+picture-in-picture helpers use Python (included in the package list).
 
 ## Interactive setup
 
@@ -24,8 +25,7 @@ The terminal UI lets you choose:
 5. Optional HP EliteBook extras — the three button mappings and fingerprint
    login; **off by default**. Bongocat and its keyd keyboard setup are
    automatically included with the Noctalia config.
-6. Optional Noctalia SDDM theme; **off by default**.
-7. Final action: **1. Apply (default)**, **2. Test apply**, **3. Cancel**.
+6. Final action: **1. Apply (default)**, **2. Test apply**, **3. Cancel**.
    Enter selects Apply. Test apply prints the plan without changing packages,
    configs or services.
 
@@ -94,6 +94,8 @@ fish --no-config setup.fish --help
 Explicit command-line `--install` and `--apply` execute directly; add
 `--dry-run` to preview. Package/config lists default to all when omitted.
 Use `--packages none` or `--configs none` for an empty list.
+The default package selection excludes sensor-specific fingerprint packages;
+select them explicitly or use `--install --apply --elitebook` to add them.
 `--wallpaper` and `--avatar` are independent options; `--elitebook`
 implies `--keyd` and adds fingerprint login.
 `--home /path/to/existing/test-home` changes the deployment destination;
@@ -261,7 +263,17 @@ are not deployed.
 The original Fish theme selection (`catppuccin-mocha`) and Hydro preferences
 are retained. If you use Hydro, install it explicitly through Fisher; Fish
 startup no longer downloads plugins. The theme must already be available to
-Fish. No new color palette or terminal is introduced by this installer.
+Fish; missing themes and optional integrations are skipped. No new terminal
+is introduced by this installer.
+
+`paruupdate` intentionally uses `--noconfirm` and a sudo keepalive, preserving
+this machine's unattended-update preference. Use plain `paru -Syu` instead
+when you want to review transaction prompts and AUR changes interactively.
+
+Brave PiP opens floating. The bundled `pip-follow` helper follows focused
+workspace changes, and Mod+Shift+V reapplies the bottom-right size/position.
+These helpers require Python and target only `brave-origin` PiP windows.
+They emulate sticky windows; Niri does not provide native sticky-window support.
 
 The snapshot keeps `us,ru,ua` keyboard layouts (Caps Lock cycles), idle timers
 of 2 minutes to turn screens off, 4 to lock and 15 to lock/suspend, and the
@@ -321,6 +333,7 @@ Mod+Alt+L locks and Mod+Shift+Q suspends. Mod+Shift+Escape shows all shortcuts.
 
 ```fish
 fish --no-config tests/test_setup.fish
+python3 tests/test_configs.py
 ```
 
 These checks deploy into temporary homes, exercising optional images, repeated
@@ -328,7 +341,7 @@ deployment, backups and shared directory links. They also load the deployed
 image settings through Noctalia with fresh state, decode both PNGs using its
 theme tool, and validate the deployed Niri config. System setup is staged under
 a test system root: the keyd profile, the fingerprint PAM rules and fprintd
-mask, and the SDDM theme. They do not install packages or test a complete fresh
+mask. They do not install packages or test a complete fresh
 CachyOS login; graphics hardware and future package versions still need
 validation on the new machine. Select both `noctalia` in the configs checklist
 and the wallpaper option to apply the wallpaper settings. Selecting only the

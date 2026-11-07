@@ -1,6 +1,8 @@
 #!/usr/bin/env fish
 set -g root (path dirname (path dirname (status filename)) | path resolve)
-set -g sandbox (mktemp -d -t dotfiles-tests.XXXXXX); or exit 1
+set -l temp_root /tmp/opencode
+test -d "$temp_root"; or set temp_root /tmp
+set -g sandbox (mktemp -d "$temp_root/dotfiles-tests.XXXXXX"); or exit 1
 function cleanup --on-event fish_exit
     rm -rf -- "$sandbox"
 end
@@ -154,6 +156,8 @@ niri validate -c "$sandbox/full/.config/niri/config.kdl"; or exit 1
 fish --no-config -n "$sandbox/full/.config/fish/config.fish"; or exit 1
 printf 'PASS: full deployment, repeat run, no Kitty/legacy JSON\n'
 expect -f "$sandbox/full/.config/yazi/flavors/noctalia.yazi/tmtheme.xml"
+expect -x "$sandbox/full/.config/niri/scripts/pip-follow"
+expect -x "$sandbox/full/.config/niri/scripts/pip-snap"
 cmp -s "$root/.config/yazi/flavors/noctalia.yazi/tmtheme.xml" \
     "$sandbox/full/.config/yazi/flavors/noctalia.yazi/tmtheme.xml"; or exit 1
 printf 'PASS: Yazi syntax-highlighting theme deployment\n'
@@ -211,4 +215,31 @@ invoke --apply --dry-run --configs noctalia --home "$sandbox/keyd-preview-home" 
 expect (count (find "$sandbox/keyd-preview-home" -mindepth 1 -print)) -eq 0
 expect (count (find "$sandbox/keyd-preview-system" -mindepth 1 -print)) -eq 0
 printf 'PASS: keyd preview writes nothing\n'
+
+# Sensor-specific packages must not be selected by default.
+invoke --install --dry-run --home "$sandbox/preview"
+if string match -rq '\+ paru .* (open-fprintd|fprintd-clients-git|python-validity)' < "$sandbox/output"
+    printf 'FAIL: fingerprint packages selected without opt-in\n' >&2
+    exit 1
+end
+printf 'PASS: fingerprint packages are opt-in\n'
+
+# Masking and backup creation must not traverse symlinked staging directories.
+mkdir -p "$sandbox/unsafe-home" "$sandbox/unsafe-system/etc/systemd" "$sandbox/outside"
+ln -s "$sandbox/outside" "$sandbox/unsafe-system/etc/systemd/system"
+fish --no-config "$root/setup.fish" --apply --elitebook --configs none \
+    --home "$sandbox/unsafe-home" --system-root "$sandbox/unsafe-system" > "$sandbox/output" 2>&1
+expect "$status" -ne 0
+expect ! -e "$sandbox/outside/fprintd.service"
+printf 'PASS: system mask rejects directory symlinks\n'
+
+mkdir -p "$sandbox/unsafe-backup/.config/alacritty" "$sandbox/unsafe-backup/.local"
+printf old > "$sandbox/unsafe-backup/.config/alacritty/alacritty.toml"
+ln -s "$sandbox/outside" "$sandbox/unsafe-backup/.local/state"
+fish --no-config "$root/setup.fish" --apply --configs alacritty \
+    --home "$sandbox/unsafe-backup" > "$sandbox/output" 2>&1
+expect "$status" -ne 0
+expect (cat "$sandbox/unsafe-backup/.config/alacritty/alacritty.toml") = old
+expect (count (find "$sandbox/outside" -mindepth 1 -print)) -eq 0
+printf 'PASS: backup rejects directory symlinks before moving originals\n'
 printf '\nAll installer checks passed.\n'

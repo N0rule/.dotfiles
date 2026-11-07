@@ -30,3 +30,11 @@
       // noise 0.03      // grain overlay (default: 0.02)
       // saturation 1.0  // color saturation boost (default: 1.5)
     }
+
+    // Disable the top-left hot corner, which toggles the Overview.
+    // It kept opening the Overview right after login. Use Mod+O to open it.
+    gestures {
+        hot-corners {
+            off
+        }
+    }

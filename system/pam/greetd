@@ -5,7 +5,7 @@
 
 auth       required     pam_securetty.so
 auth       requisite    pam_nologin.so
-auth [success=1 new_authtok_reqd=1 default=ignore] pam_unix.so try_first_pass likeauth nullok
+auth [success=1 new_authtok_reqd=1 default=ignore] pam_unix.so try_first_pass likeauth
 auth       sufficient   pam_fprintd.so
 
 auth       include      system-local-login

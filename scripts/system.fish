@@ -12,8 +12,7 @@ function system_begin
     set -g setup_system_ready 1
 end
 
-function system_copy --argument-names source relative
-    set -l target (path normalize "$setup_system_root/$relative")
+function system_safe_parent --argument-names target
     set -l parent (path dirname "$target")
     set -l ancestor "$parent"
     while test "$ancestor" != "$setup_system_root"; and test "$ancestor" != /
@@ -23,12 +22,18 @@ function system_copy --argument-names source relative
         end
         set ancestor (path dirname "$ancestor")
     end
+end
+
+function system_copy --argument-names source relative
+    set -l target (path normalize "$setup_system_root/$relative")
+    system_safe_parent "$target"; or return 1
     if test -f "$target"; and cmp -s -- "$source" "$target"
         printf 'Unchanged %s\n' "$target"
         return 0
     end
     if test -e "$target"; or test -L "$target"
         set -l saved "$setup_system_backup/$relative"
+        system_safe_parent "$saved"; or return 1
         run_command $setup_system_prefix mkdir -p -- (path dirname "$saved"); or return 1
         if test -L "$target"
             set saved "$saved.symlink"
@@ -45,12 +50,14 @@ end
 function system_mask --argument-names relative
     # Replace a unit file with a symlink to /dev/null (a systemd mask).
     set -l target (path normalize "$setup_system_root/$relative")
+    system_safe_parent "$target"; or return 1
     if test -L "$target"; and test (readlink -- "$target") = /dev/null
         printf 'Unchanged %s\n' "$target"
         return 0
     end
     if test -e "$target"; or test -L "$target"
         set -l saved "$setup_system_backup/$relative"
+        system_safe_parent "$saved"; or return 1
         run_command $setup_system_prefix mkdir -p -- (path dirname "$saved"); or return 1
         if test -L "$target"
             set saved "$saved.symlink"

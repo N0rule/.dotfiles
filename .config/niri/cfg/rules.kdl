@@ -1,45 +1,7 @@
+    // ─── Global ───
     window-rule {
         geometry-corner-radius 20 // Set every window radius to 20
         clip-to-geometry true
-    }
-
-    window-rule {
-        match app-id="Alacritty"
-        default-column-width { proportion 0.75; }
-    }
-
-    // btop needs room for its graphs and tables, so give it its own big column
-    // instead of squeezing it into a tile.
-    window-rule {
-        match app-id="Alacritty" title=r#"^btop$"#
-        default-column-width { fixed 1280; }
-        default-window-height { fixed 760; }
-    }
-
-    // if you use steam you will probably like these
-    window-rule {
-        match app-id="steam"
-        exclude title=r#"^[Ss]team$"#
-        open-floating true
-    }
-
-    window-rule {
-       match app-id="steam" title=r#"^notificationtoasts_\d+_desktop$"#
-       default-floating-position x=10 y=10 relative-to="bottom-right"
-       open-focused false
-    }
-
-    layer-rule {
-        match namespace="^noctalia-wallpaper*"
-        place-within-backdrop true
-    }
-
-    // Floating Noctalia settings window.
-    window-rule {
-      match app-id="dev.noctalia.Noctalia.Settings"
-      open-floating false
-      default-column-width { fixed 1080; }
-      default-window-height { fixed 920; }
     }
 
     window-rule {
@@ -52,3 +14,70 @@
         xray false
       }
     }
+
+    // ─── Noctalia ───
+    layer-rule {
+        match namespace="^noctalia-wallpaper.*$"
+        place-within-backdrop true
+    }
+
+    // Tiled Noctalia settings window.
+    window-rule {
+      match app-id="dev.noctalia.Noctalia.Settings"
+      open-floating false
+      default-column-width { fixed 1080; }
+      default-window-height { fixed 920; }
+    }
+
+
+    // ─── Alacritty ───
+    window-rule {
+        match app-id="Alacritty"
+        default-column-width { proportion 0.75; }
+    }
+
+    //  ─── btop ───
+    window-rule {
+        match app-id="Alacritty" title=r#"^btop$"#
+        default-column-width { fixed 1280; }
+    }
+
+    // ─── Steam ───
+    window-rule {
+        match app-id="steam"
+        exclude title=r#"^[Ss]team$"#
+        open-floating true
+    }
+
+    window-rule {
+       match app-id="steam" title=r#"^notificationtoasts_\d+_desktop$"#
+       default-floating-position x=10 y=10 relative-to="bottom-right"
+       open-focused false
+    }
+
+    // ─── Brave picture-in-picture ───
+    // Brave opens PiP as a regular toplevel, so niri would tile it and steal
+    // focus. Keep it as a small always-on-top overlay in the bottom-right
+    // corner instead: no border, no focus ring, just the video.
+    window-rule {
+        match app-id="brave-origin" title=r#"^(?i:picture[ -]in[ -]picture)$"#
+        open-floating true
+        open-focused false
+        default-floating-position x=24 y=24 relative-to="bottom-right"
+        default-column-width { fixed 320; }
+        default-window-height { fixed 180; }
+        focus-ring { off; }
+        border { off; }
+        shadow {
+            on
+            offset x=0 y=6
+            softness 24
+            color "#000000aa"
+        }
+    }
+
+// ─── Pianoteq ───
+window-rule {
+    match app-id=r#"^pianoteq 9\.exe$"# title=r#"^Pianoteq v9\.\d+\.\d+$"#
+    open-floating false
+}

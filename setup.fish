@@ -1,5 +1,5 @@
 #!/usr/bin/env -S fish --no-config
-# CachyOS + Niri + native Noctalia. No Python or UI dependency.
+# CachyOS + Niri + native Noctalia. Installer needs no Python or UI package.
 set -g setup_root (path dirname (status filename) | path resolve)
 set -g setup_home $HOME
 set -g setup_install 0
@@ -15,6 +15,7 @@ source "$setup_root/scripts/system.fish"
 set -g setup_configs niri noctalia fish alacritty tmux atuin btop fastfetch yazi
 set -g setup_repo
 set -g setup_aur
+set -g setup_fingerprint_packages open-fprintd fprintd-clients-git python-validity
 
 function fail
     printf 'Error: %s\n' "$argv" >&2
@@ -129,6 +130,15 @@ function render_noctalia
 end
 
 function save_target --argument-names target
+    # Backups must never escape through a pre-existing directory symlink.
+    set -l ancestor "$setup_backup"
+    while test "$ancestor" != "$setup_home"
+        if test -L "$ancestor"
+            fail "Refusing to write backups through directory link: $ancestor"
+            return 1
+        end
+        set ancestor (path dirname "$ancestor")
+    end
     set -l relative (string sub -s (math (string length -- "$setup_home") + 2) -- "$target")
     set -l saved "$setup_backup/$relative"
     if test -L "$target"
@@ -257,6 +267,11 @@ function main
     set -g setup_repo (read_packages "$setup_root/packages/repo.txt")
     set -g setup_aur (read_packages "$setup_root/packages/aur.txt")
     set -g setup_selected_packages $setup_repo $setup_aur
+    # Sensor-specific packages are available explicitly, but are not defaults.
+    for package in $setup_fingerprint_packages
+        set -l index (contains -i -- "$package" $setup_selected_packages)
+        test -n "$index"; and set -e setup_selected_packages[$index]
+    end
     set -g setup_selected_configs $setup_configs
     if set -q _flag_list
         printf 'Repository packages:\n%s\n\nAUR packages:\n%s\n\nConfigs:\n%s\n' \
@@ -327,7 +342,7 @@ function main
                 return 2
         end
         if test "$setup_install" = 1
-            set -g setup_selected_packages (checklist 'Packages (Noctalia includes keyd and evtest automatically)' all $setup_repo $setup_aur)
+            set -g setup_selected_packages (checklist 'Packages (Noctalia includes keyd and evtest automatically; EliteBook adds fingerprint packages)' all $setup_selected_packages)
             or return 0
         end
         if test "$setup_apply" = 1
@@ -368,7 +383,7 @@ function main
     # The EliteBook fingerprint login needs the open-fprintd stack and its PAM
     # client, which are all AUR packages.
     if test "$setup_install" = 1; and test "$setup_fingerprint" = 1
-        for dependency in open-fprintd fprintd-clients-git python-validity
+        for dependency in $setup_fingerprint_packages
             if not contains -- "$dependency" $setup_selected_packages
                 set -a setup_selected_packages "$dependency"
             end
